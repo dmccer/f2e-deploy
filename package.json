@@ -1,0 +1,22 @@
+{
+  "name": "f2e-deploy",
+  "version": "1.0.0",
+  "description": "前端部署平台",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.guluabc.com:f2e/f2e-deploy.git"
+  },
+  "keywords": [
+    "前端",
+    "部署",
+    "打包",
+    "压缩",
+    "发布"
+  ],
+  "author": "Kane",
+  "license": "ISC"
+}
