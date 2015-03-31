@@ -11,6 +11,8 @@ router.post('/alpha', function (req, res) {
 
   var log;
 
+  console.log(req.body);
+
   var build_rs = f2e_build(
     req.body,
     config.alpha_work_path
