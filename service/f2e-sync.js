@@ -3,7 +3,7 @@ var shell = require('shelljs');
 
 module.exports = function(proj_dir, static_server) {
   var pkg = require(path.resolve(proj_dir, './package.json'));
-  var deploy_dir = path.resolve(proj_dir, pkg.name, pkg.version;
+  var deploy_dir = path.resolve(proj_dir, pkg.name, pkg.version);
 
   console.log(pkg.name, pkg.version, pkg.dest);
 
