@@ -14,7 +14,6 @@ app.use(function(req, res, next) {
   if (method === 'get' && !auth_service.check(req.query.secret)
     || method === 'post' && !auth_service.check(req.body.secret)) {
     res.status(403).send('无权限');
-    console.log('test after send');
     return;
   }
 

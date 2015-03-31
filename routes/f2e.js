@@ -11,19 +11,24 @@ router.post('/alpha', function (req, res) {
 
   var log;
 
-  console.log(req.body);
-
   var build_rs = f2e_build(
     req.body,
     config.alpha_work_path
   );
 
-  if (build_rs) {
-    log = build_rs.log + f2e_sync(
-      build_rs.out_file,
-      config.static_server.alpha
-    );
+  if (!build_rs) {
+    res.status(200).json({
+      code: 500,
+      data: 'error on build'
+    });
+
+    console.log('after xxxx');
   }
+
+  log = build_rs.log + f2e_sync(
+    build_rs.out_file,
+    config.static_server.alpha
+  );
 
   res.status(200).json({
     code: 200,
