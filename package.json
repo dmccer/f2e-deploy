@@ -18,5 +18,8 @@
     "发布"
   ],
   "author": "Kane",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.12.3"
+  }
 }
