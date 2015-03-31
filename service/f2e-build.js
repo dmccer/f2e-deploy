@@ -23,22 +23,20 @@ module.exports = function(data, dest) {
   
   var out_file = path.resolve(dest, repos_name + postfix);
 
-  console.log('ssss: ', [
+  var log = shell.exec('mkdir -p ' + dest).output +
+
+  shell.exec([
     'curl -o',
     out_file,
     tar_gz_url
-  ].join(' '))
-  var log = shell.exec('mkdir -p ' + dest).output
+  ].join(' ')).output +
 
-  + shell.exec([
-    'curl -o',
-    out_file,
-    tar_gz_url
-  ].join(' ')).output
+  shell.exec('tar zxvf ' + out_file).output;
+  
+  
+  shell.cd(path.dirname(out_file));
 
-  + shell.exec('tar zxvf ' + out_file).output
-  + shell.cd(path.dirname(out_file)).output
-  + shell.exec('npm run prestart');
+  log += shell.exec('npm run prestart');
 
   return {
     out_file: out_file,
