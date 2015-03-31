@@ -37,7 +37,7 @@ module.exports = function(data, dest) {
   ].join(' ')).output
 
   + shell.exec('tar zxvf ' + out_file).output
-  + shell.cd(out_file).output
+  + shell.cd(path.dirname(out_file)).output
   + shell.exec('npm run prestart');
 
   return {

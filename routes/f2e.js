@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var path = require('path');
 var config = require('../config');
 var f2e_build = require('../service/f2e-build');
 var f2e_sync = require('../service/f2e-sync');
@@ -26,7 +27,7 @@ router.post('/alpha', function (req, res) {
   }
 
   log = build_rs.log + f2e_sync(
-    build_rs.out_file,
+    path.dirname(build_rs.out_file),
     config.static_server.alpha
   );
 
