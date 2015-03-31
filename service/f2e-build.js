@@ -18,7 +18,7 @@ module.exports = function(data, dest) {
   var tar_gz_url = [
     repos_url,
     'archive',
-    data.commits.id + postfix
+    commit_id + postfix
   ].join('/');
   
   var out_file = path.resolve(dest, repos_name + postfix);
