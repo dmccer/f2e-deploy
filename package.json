@@ -20,6 +20,7 @@
   "author": "Kane",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.12.2",
     "express": "^4.12.3"
   }
 }
