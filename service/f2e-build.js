@@ -21,7 +21,8 @@ module.exports = function(data, dest) {
     commit_id + postfix
   ].join('/');
   
-  var out_file = path.resolve(dest, repos_name + postfix);
+  var out_dir = path.resolve(dest, repos_name);
+  var out_file = out_dir + postfix;
 
   var log = shell.exec('mkdir -p ' + dest).output +
 
@@ -31,15 +32,14 @@ module.exports = function(data, dest) {
     tar_gz_url
   ].join(' ')).output +
 
-  shell.exec('tar zxvf ' + out_file).output;
-  
-  
-  shell.cd(path.dirname(out_file));
+  shell.exec(['tar zxvf', out_file, '-C', out_dir].join(' ')).output;
+
+  shell.cd(out_dir);
 
   log += shell.exec('npm run prestart');
 
   return {
-    out_file: out_file,
+    out_dir: out_dir,
     log: log
   };
 }

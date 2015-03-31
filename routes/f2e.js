@@ -27,7 +27,7 @@ router.post('/alpha', function (req, res) {
   }
 
   log = build_rs.log + f2e_sync(
-    path.dirname(build_rs.out_file),
+    build_rs.out_dir,
     config.static_server.alpha
   );
 
