@@ -23,7 +23,7 @@ module.exports = function(data, dest) {
   
   var out_file = path.resolve(dest, repos_name + postfix);
 
-  var log = shell.exec('sudo mkdir -p ' + dest).output
+  var log = shell.exec('mkdir -p ' + dest).output
   + shell.exec([
     'curl -o',
     out_file,
