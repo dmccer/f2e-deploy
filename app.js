@@ -15,7 +15,10 @@ app.use(function(req, res, next) {
     || method === 'post' && !auth_service.check(req.body.secret)) {
     res.status(403).send('无权限');
     console.log('test after send');
+    return;
   }
+
+  next();
 });
 
 app.use('/f2e', f2e);
@@ -25,5 +28,5 @@ var server = app.listen(9999, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  console.log('git web hook server: ', host, port);
+  console.log('git web hook server', host, port);
 });
