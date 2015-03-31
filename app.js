@@ -2,17 +2,23 @@ var express = require('express');
 var bodyParser = require('body-parser')
 var app = express();
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+var f2e = require('./routes/f2e');
+var auth_service = require('./service/authorization');
 
-// parse application/json
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.post('/deploy', function (req, res) {
-  console.log('req: ', req.body);
+app.use(function(req, res, next) {
+  var method = req.method.toLowerCase();
 
-  res.send('Hello World!');
+  if (method === 'get' && !auth_service.check(req.query.secret)
+    || method === 'post' && !auth_service.check(req.body.secret)) {
+    res.status(403).send('无权限');
+    console.log('test after send');
+  }
 });
+
+app.use('/f2e', f2e);
 
 var server = app.listen(9999, function () {
 
