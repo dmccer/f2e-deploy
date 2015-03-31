@@ -32,6 +32,8 @@ module.exports = function(data, dest) {
     tar_gz_url
   ].join(' ')).output +
 
+  shell.exec('mkdir -p ' + out_dir).output +
+
   shell.exec(['tar zxvf', out_file, '-C', out_dir].join(' ')).output;
 
   shell.cd(out_dir);
