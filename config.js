@@ -7,6 +7,8 @@ module.exports = {
   prelease_work_path: path.resolve(root_path, './deploy/prelease'),
   prd_work_path: path.resolve(root_path, './deploy/prd'),
 
+  qiniu: path.resolve(root_path, './conf.json'),
+
   static_server: {
     alpha: '/usr/share/nginx/html'
   }

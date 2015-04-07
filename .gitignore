@@ -1,5 +1,7 @@
 dist/
 semantic/dist/
+.DS_Store
+qconf.json
 
 # Numerous always-ignore extensions
 *.bak
