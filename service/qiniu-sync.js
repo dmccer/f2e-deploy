@@ -10,7 +10,7 @@ module.exports = function() {
 
   var output = shell.exec('qrsync ' + config.qiniu).output;
 
-  console.log(dest_dir);
+  console.log('上传七牛成功');
   
   return output;
 };
