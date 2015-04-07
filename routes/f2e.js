@@ -5,7 +5,6 @@ var config = require('../config');
 var f2e_build = require('../service/f2e-build');
 var f2e_sync = require('../service/f2e-sync');
 var qiniu_sync = require('../service/qiniu-sync');
-var jf = require('jsonfile');
 
 module.exports = router;
 
