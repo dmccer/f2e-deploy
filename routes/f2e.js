@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var logger = require('../logger')('publish');
 var path = require('path');
+var shell = require('shelljs');
 var config = require('../config');
 var f2e_build = require('../service/f2e-build');
 var f2e_sync = require('../service/f2e-sync');
@@ -54,6 +55,11 @@ router.post('/alpha', function (req, res) {
 
   logger.info('正在更新版本数据库...');
   f2e_version(build_rs.repository.owner.username + '/' + build_rs.repository.name, pkg.version, build_rs.repository.url);
+  logger.info('版本更新成功');
+
+  logger.info('正在清理发布目录...');
+  shell.exec(['rm', '-rf', build_rs.out_dir].join(' '));
+  logger.info('清理发布目录完成');
 
   // logger.warn('other info:');
   // logger.info(log);

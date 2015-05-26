@@ -50,6 +50,10 @@ module.exports = function(data, dest) {
   log += shell.exec('npm run prestart');
   logger.info('编译完成');
 
+  logger.info('正在删除压缩文件...');
+  shell.exec(['rm', '-rf', out_file].join(' '));
+  logger.info('删除压缩文件成功');
+
   return {
     out_dir: out_dir,
     repository: data.repository,
