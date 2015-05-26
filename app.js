@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var f2e = require('./routes/f2e');
 var auth_service = require('./service/authorization');
+var log4js = require('log4js');
 var logger = require('./logger')('express');
 var app = express();
 

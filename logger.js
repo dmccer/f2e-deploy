@@ -9,7 +9,7 @@ module.exports = function(category) {
       { type: 'console' },
       {
         type: 'file',
-        filename: 'logs/express.log',
+        filename: 'log/express.log',
         category: category
       }
     ]
