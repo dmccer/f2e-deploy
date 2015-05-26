@@ -55,8 +55,8 @@ router.post('/alpha', function (req, res) {
   logger.info('正在更新版本数据库...');
   f2e_version(build_rs.repository.owner.username + '/' + build_rs.repository.name, pkg.version, build_rs.repository.url);
 
-  logger.warn('other info:');
-  logger.info(log);
+  // logger.warn('other info:');
+  // logger.info(log);
 
   res.status(200).json({
     code: 200,
