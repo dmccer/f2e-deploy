@@ -1,22 +1,9 @@
 var express = require('express');
-var log4js = require('log4js');
 var bodyParser = require('body-parser');
 var f2e = require('./routes/f2e');
 var auth_service = require('./service/authorization');
+var logger = require('./logger')('express');
 var app = express();
-
-log4js.configure({
-  appenders: [
-    { type: 'console' },
-    {
-      type: 'file',
-      filename: 'logs/express.log',
-      category: 'express'
-    }
-  ]
-});
-
-var logger = log4js.getLogger('express');
 
 app.use(log4js.connectLogger(logger, { level: 'auto' }));
 app.use(bodyParser.urlencoded({ extended: false }));

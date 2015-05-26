@@ -1,20 +1,6 @@
 var shell = require('shelljs');
 var path = require('path');
-var log4js = require('log4js');
-
-log4js.configure({
-  appenders: [
-    { type: 'console' },
-    {
-      type: 'file',
-      filename: 'log/express.log',
-      category: 'publish'
-    }
-  ]
-});
-
-var logger = log4js.getLogger('publish');
-
+var logger = require('../logger')('publish');
 
 module.exports = function(data, dest) {
   if (!data || !data.commits.length) {

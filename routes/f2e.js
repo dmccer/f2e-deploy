@@ -1,25 +1,12 @@
 var express = require('express');
 var router = express.Router();
-var log4js = require('log4js');
+var logger = require('../logger')('publish');
 var path = require('path');
 var config = require('../config');
 var f2e_build = require('../service/f2e-build');
 var f2e_sync = require('../service/f2e-sync');
 var qiniu_sync = require('../service/qiniu-sync');
 var f2e_version = require('../service/f2e-version');
-
-log4js.configure({
-  appenders: [
-    { type: 'console' },
-    {
-      type: 'file',
-      filename: 'log/express.log',
-      category: 'publish'
-    }
-  ]
-});
-
-var logger = log4js.getLogger('publish');
 
 module.exports = router;
 
