@@ -40,7 +40,16 @@ router.post('/alpha', function (req, res) {
   logger.info('正在发布静态资源到服务器...');
   log += f2e_sync(src, dest_dir);
   logger.info('正在发布静态资源到七牛服务器...');
-  log += qiniu_sync();
+
+  try {
+    log += qiniu_sync();
+  } catch(e) {
+    // 暂不做处理，因为七牛服务器不接受 html 文件，所以导致错误
+    logger.error('上传静态资源到七牛服务器出错...');
+    logger.error(e.message);
+    console.log(e);
+  }
+
   logger.info('静态资源发布成功');
 
   logger.info('正在更新版本数据库...');
