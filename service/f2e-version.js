@@ -1,18 +1,7 @@
 var url = require('url');
 var config = require('../config');
 var request = require('request');
-var logger = log4js.getLogger('publish');
-
-log4js.configure({
-  appenders: [
-    { type: 'console' },
-    {
-      type: 'file',
-      filename: 'log/express.log',
-      category: 'publish'
-    }
-  ]
-});
+var logger = require('../logger')('publish');
 
 module.exports = function (params, callback) {
   logger.info('即将写入的数据: ' + JSON.stringify(params));

@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var f2e = require('./routes/f2e');
 var auth_service = require('./service/authorization');
 var log4js = require('log4js');
-var logger = require('./logger')('express');
+var logger = require('./logger')('deploy');
 var app = express();
 
 app.use(log4js.connectLogger(logger, { level: 'auto' }));

@@ -2,14 +2,14 @@ var log4js = require('log4js');
 
 
 module.exports = function(category) {
-  category = category || 'express';
+  category = category || 'deploy';
 
   log4js.configure({
     appenders: [
       { type: 'console' },
       {
         type: 'file',
-        filename: 'log/express.log',
+        filename: 'log/deploy.log',
         category: category
       }
     ]
