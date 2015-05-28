@@ -19,6 +19,8 @@ module.exports = function (params, callback) {
     }
   };
 
+  logger.trace('请求地址: ' + opt.url);
+
   request(opt, function(err, res, body) {
     if (!err && res.statusCode == 200) {
       var data = JSON.parse(body);
