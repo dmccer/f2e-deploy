@@ -7,6 +7,7 @@ module.exports = function (params, callback) {
   logger.info('即将写入的数据: ' + JSON.stringify(params));
 
   var opt = {
+    method: 'POST',
     url: url.resolve(config.vermgr.url, '/repos/' + params.name),
     body: {
       owner: params.owner,
