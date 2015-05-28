@@ -54,18 +54,23 @@ router.post('/alpha', function (req, res) {
   logger.info('静态资源发布成功');
 
   logger.info('正在更新版本数据库...');
-  f2e_version(build_rs.repository.owner.username + '/' + build_rs.repository.name, pkg.version, build_rs.repository.url);
-  logger.info('版本更新成功');
+  f2e_version({
+    owner: build_rs.repository.owner.username,
+    name: build_rs.repository.name,
+    version: pkg.version,
+    url: build_rs.repository.url
+  }, function() {
+    logger.info('版本更新成功');
+    // logger.info('正在清理发布目录...');
+    // shell.exec(['rm', '-rf', build_rs.out_dir].join(' '));
+    // logger.info('清理发布目录完成');
 
-  // logger.info('正在清理发布目录...');
-  // shell.exec(['rm', '-rf', build_rs.out_dir].join(' '));
-  // logger.info('清理发布目录完成');
+    // logger.warn('other info:');
+    // logger.info(log);
 
-  // logger.warn('other info:');
-  // logger.info(log);
-
-  res.status(200).json({
-    code: 200,
-    data: log
+    res.status(200).json({
+      code: 200,
+      data: log
+    });
   });
 });
