@@ -27,7 +27,9 @@ module.exports = function (params, callback) {
       logger.info(JSON.stringify(data));
     } else {
       logger.fatal('写入版本到数据库失败');
-      logger.info(err.message);
+      logger.info('status code: ' + res.statusCode);
+      logger.info('response body: ' + body);
+      logger.info('错误信息: ' + err.message);
     }
 
     callback();
