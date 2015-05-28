@@ -9,7 +9,7 @@ module.exports = function (params, callback) {
   var opt = {
     method: 'POST',
     url: url.resolve(config.vermgr.url, '/repos/' + params.name),
-    body: {
+    form: {
       owner: params.owner,
       version: params.version,
       url: params.url
