@@ -1,7 +1,6 @@
 var log4js = require('log4js');
 
-
-module.exports = function(category) {
+module.exports = function(file, category) {
   category = category || 'deploy';
 
   log4js.configure({
@@ -9,7 +8,7 @@ module.exports = function(category) {
       { type: 'console' },
       {
         type: 'file',
-        filename: 'log/deploy.log',
+        filename: file || 'log/deploy.log',
         category: category
       }
     ]

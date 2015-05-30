@@ -1,23 +1,26 @@
 var express = require('express');
 var router = express.Router();
-var logger = require('../logger')('publish');
 var path = require('path');
 var shell = require('shelljs');
 var config = require('../config');
-var f2e_build = require('../service/f2e-build');
-var f2e_sync = require('../service/f2e-sync');
+var build = require('../service/build');
+var origin_sync = require('../service/origin_sync');
 var qiniu_sync = require('../service/qiniu-sync');
-var f2e_version = require('../service/f2e-version');
+var version = require('../service/version');
 
 module.exports = router;
 
 router.post('/alpha', function (req, res) {
-  console.log('准备发布 alpha 环境...');
+  var repos = req.body.repository;
+  var log_dir = 'log/' + repos.owner.username;
+  var log_file = log_dir + '/' + repos.name + '.log';
+  shell.exec('mkdir -p ' + log_dir);
+  shell.exec('touch ' + log_file);
+  var logger = require('../logger')(log_file, 'publish');
 
-  var log = '';
-
+  logger.info('准备发布 alpha 环境...');
   logger.info('正在预处理静态资源...');
-  var build_rs = f2e_build(
+  var build_rs = build(
     req.body,
     config.alpha_work_path
   );
@@ -26,11 +29,9 @@ router.post('/alpha', function (req, res) {
     logger.fatal('预处理静态资源失败');
     return res.status(200).json({
       code: 500,
-      data: 'error on build'
+      data: '预处理静态资源过程中发生错误'
     });
   }
-
-  log += build_rs.log;
 
   logger.info('预处理静态资源完成');
 
@@ -39,7 +40,7 @@ router.post('/alpha', function (req, res) {
   var dest_dir = path.resolve(config.static_server.alpha, pkg.name, pkg.version);
 
   logger.info('正在发布静态资源到服务器...');
-  log += f2e_sync(src, dest_dir);
+  log += origin_sync(src, dest_dir);
   logger.info('正在发布静态资源到七牛服务器...');
 
   try {
@@ -47,14 +48,14 @@ router.post('/alpha', function (req, res) {
   } catch(e) {
     // 暂不做处理，因为七牛服务器不接受 html 文件，所以导致错误
     logger.error('上传静态资源到七牛服务器出错...');
-    logger.error(e.message);
-    console.log(e);
+    logger.error('错误信息:\n');
+    logger.info(e);
   }
 
   logger.info('静态资源发布成功');
 
   logger.info('正在更新版本数据库...');
-  f2e_version({
+  version({
     owner: build_rs.repository.owner.username,
     name: build_rs.repository.name,
     version: pkg.version,
