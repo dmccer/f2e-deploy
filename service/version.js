@@ -3,7 +3,7 @@ var config = require('../config');
 var request = require('request');
 
 module.exports = function (params, callback) {
-  var logger = require('../logger')('log/' + params.owner + '/' + params.name, 'publish');
+  var logger = require('../logger')('log/' + params.owner + '/' + params.name + '.log', 'publish');
   logger.info('即将写入的数据: ' + JSON.stringify(params));
 
   var opt = {
