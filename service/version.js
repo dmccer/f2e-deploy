@@ -1,4 +1,5 @@
 var url = require('url');
+var path = require('path');
 var config = require('../config');
 var request = require('request');
 
