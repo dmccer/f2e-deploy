@@ -16,6 +16,7 @@ router.post('/alpha', function (req, res) {
   var log_file = log_dir + '/' + repos.name + '.log';
   shell.exec('mkdir -p ' + log_dir);
   shell.exec('touch ' + log_file);
+  shell.exec('> ' + log_file);
   var logger = require('../logger')(log_file, 'publish');
 
   logger.info('准备发布 alpha 环境...');
