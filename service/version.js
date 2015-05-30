@@ -4,7 +4,7 @@ var config = require('../config');
 var request = require('request');
 
 module.exports = function (params, callback) {
-  var logger = require('../logger')(path.join(config.root, 'log/' + params.owner + '/' + params.name + '.log'), 'version');
+  var logger = require('../logger')(path.resolve(config.root, './log/' + params.owner + '/' + params.name + '.log'), 'version');
   logger.info('即将写入的数据: ' + JSON.stringify(params));
 
   var opt = {
