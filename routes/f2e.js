@@ -40,15 +40,30 @@ router.post('/alpha', function (req, res) {
   var dest_dir = path.resolve(config.static_server.alpha, pkg.name, pkg.version);
 
   logger.info('正在发布静态资源到服务器...');
-  log += origin_sync(src, dest_dir);
+  var origin_sync_rs = origin_sync(src, dest_dir);
+  if (origin_sync_rs.code !== 0) {
+    logger.fatal('静态资源发布到服务器失败');
+    logger.info('错误信息:\n' + origin_sync_rs.output);
+
+    res.status(200).json({
+      code: 500,
+      data: '静态资源发布到服务器失败'
+    });
+
+    return;
+  }
+
   logger.info('正在发布静态资源到七牛服务器...');
 
   try {
-    log += qiniu_sync();
+    var qiniu_sync_rs = qiniu_sync();
+
+    if (qiniu_sync_rs.code !== 0) {
+      logger.error('上传静态资源到七牛服务器出错...');
+      logger.error('错误信息:\n' + qiniu_sync_rs.output);
+    }
   } catch(e) {
     // 暂不做处理，因为七牛服务器不接受 html 文件，所以导致错误
-    logger.error('上传静态资源到七牛服务器出错...');
-    logger.error('错误信息:\n');
     logger.info(e);
   }
 
