@@ -86,7 +86,7 @@ router.post('/alpha', function (req, res) {
 
     res.status(200).json({
       code: 200,
-      data: log
+      data: '项目发布成功'
     });
   });
 });
