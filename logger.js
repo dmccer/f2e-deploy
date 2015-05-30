@@ -11,7 +11,8 @@ module.exports = function(file, category) {
         filename: file || 'log/deploy.log',
         category: category
       }
-    ]
+    ],
+    replaceConsole: true
   });
 
   return log4js.getLogger(category);
