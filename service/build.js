@@ -27,7 +27,7 @@ module.exports = function(data, dest) {
     commit_id + postfix
   ].join('/');
 
-  var out_dir = path.resolve(dest, repos_name);
+  var out_dir = path.resolve(dest, owner_name, repos_name);
   var out_file = out_dir + postfix;
 
   var mk_out_dir = shell.exec('mkdir -p ' + out_dir);

@@ -10,6 +10,51 @@ var version = require('../service/version');
 
 module.exports = router;
 
+router.get('/alpha/:name', function(req, res) {
+  var logger = require('../logger')('log/down_gz.log', 'downgz');
+  var owner = req.query.owner;
+  var name = req.params.name;
+  var repos_work_dir = path.resolve(config.alpha_work_path, owner, name);
+  var deployed_dir = path.resolve(config.static_server.alpha, owner, name);
+
+  if (!shell.test('-e', repos_work_dir)) {
+    res.status(200).json({
+      data: owner + '/' + name + '项目不存在或从未发布'
+    });
+  }
+
+  var pkg = require(path.resolve(repos_work_dir, './package.json'));
+  var filename = pkg.version + '.tar.gz';
+  var fileurl = path.resolve(deployed_dir, filename);
+  if (!shell.test('-f', fileurl)) {
+    res.status(200).json({
+      data: owner + '/' + name + '项目从未发布成功'
+    });
+  }
+
+  res.sendFile(filename, {
+    root: depployed_dir,
+    dotfiles: 'deny',
+    headers: {
+      'x-timestamp': Date.now(),
+      'x-sent': true
+    }
+  }, function(err) {
+    if (err) {
+      logger.error(fileurl + '下载失败');
+      logger.info('错误信息如下： \n' + err.message);
+      res.status(err.status).end();
+
+      return;
+    }
+
+    logger.info(fileurl + '下载成功');
+  });
+});
+
+// TODO
+// 1. 工作区按 repos owner 分组
+// 2. 静态服务器按 respos owner 分组
 router.post('/alpha', function (req, res) {
   var repos = req.body.repository;
   var log_dir = 'log/' + repos.owner.username;
@@ -38,7 +83,7 @@ router.post('/alpha', function (req, res) {
 
   var pkg = require(path.resolve(build_rs.out_dir, './package.json'));
   var src = path.resolve(build_rs.out_dir, pkg.dest, './*');
-  var dest_dir = path.resolve(config.static_server.alpha, pkg.name, pkg.version);
+  var dest_dir = path.resolve(config.static_server.alpha, repos.owner.username, pkg.name, pkg.version);
 
   logger.info('正在发布静态资源到服务器...');
   var origin_sync_rs = origin_sync(src, dest_dir);
@@ -69,6 +114,31 @@ router.post('/alpha', function (req, res) {
   }
 
   logger.info('静态资源发布成功');
+
+  logger.info('正在生成静态资源压缩包...');
+  // TODO
+  // 优化：工作区压缩，然后上传到静态服务器
+
+  // 进入静态服务器目录
+  shell.exec('cd ' + path.dirname(dest_dir));
+
+  var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + dest_dir);
+  var tar_gz_tip_prefix = '生成静态资源压缩包' + path.resolve(des_dir, pkg.version);
+
+  if (tar_gz.code !== 0) {
+    var err_tip = tar_gz_tip_prefix + '失败';
+
+    logger.fatal(err_tip);
+    logger.info('错误信息:\n' + tar_gz.output);
+
+    res.status(200).json({
+      code: 500,
+      data: err_tip
+    });
+
+    return;
+  }
+  logger.info(tar_gz_tip_prefix + '成功');
 
   logger.info('正在更新版本数据库...');
   version({
