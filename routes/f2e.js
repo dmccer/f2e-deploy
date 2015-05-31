@@ -33,7 +33,7 @@ router.get('/alpha/:name', function(req, res) {
   }
 
   res.attachment(fileurl);
-  res.status(200).end();
+  res.end('Download OK', 'UTF-8');
 
   // res.download(fileurl, 'name.tar.gz', function(err) {
   //   if (err) {
