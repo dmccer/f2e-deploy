@@ -32,14 +32,7 @@ router.get('/alpha/:name', function(req, res) {
     });
   }
 
-  res.sendFile(filename, {
-    root: deployed_dir,
-    dotfiles: 'deny',
-    headers: {
-      'x-timestamp': Date.now(),
-      'x-sent': true
-    }
-  }, function(err) {
+  res.download(fileurl, 'name.tar.gz', function(err) {
     if (err) {
       logger.error(fileurl + '下载失败');
       logger.info('错误信息如下： \n' + err.message);
