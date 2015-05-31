@@ -113,8 +113,8 @@ router.post('/alpha', function (req, res) {
   // 优化：工作区压缩，然后上传到静态服务器
 
   // 进入静态服务器目录
-  console.log(path.dirname(dest_dir));
   shell.cd(path.dirname(dest_dir));
+  console.log(shell.pwd());
 
   var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + dest_dir);
   var tar_gz_tip_prefix = '生成静态资源压缩包' + path.resolve(dest_dir, pkg.version);
