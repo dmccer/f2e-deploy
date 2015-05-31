@@ -136,7 +136,8 @@ router.post('/alpha', function (req, res) {
     owner: build_rs.repository.owner.username,
     name: build_rs.repository.name,
     version: pkg.version,
-    url: build_rs.repository.url
+    url: build_rs.repository.url,
+    download: 'http://d.ifdiu.com/f2e/alpha/' + build_rs.repository.name + '?secret=yunhua@926&owner=' + build_rs.repository.owner.username
   }, function() {
     logger.info('版本更新成功');
     // logger.info('正在清理发布目录...');
