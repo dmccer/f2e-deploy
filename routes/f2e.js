@@ -33,7 +33,7 @@ router.get('/alpha/:name', function(req, res) {
   }
 
   res.sendFile(filename, {
-    root: depployed_dir,
+    root: deployed_dir,
     dotfiles: 'deny',
     headers: {
       'x-timestamp': Date.now(),
