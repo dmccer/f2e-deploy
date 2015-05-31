@@ -32,20 +32,17 @@ router.get('/alpha/:name', function(req, res) {
     });
   }
 
-  res.attachment(fileurl);
-  res.end('Download OK', 'UTF-8');
+  res.download(fileurl, name + '.tar.gz', function(err) {
+    if (err) {
+      logger.error(fileurl + '下载失败');
+      logger.info('错误信息如下： \n' + err.message);
+      res.status(err.status).end();
 
-  // res.download(fileurl, 'name.tar.gz', function(err) {
-  //   if (err) {
-  //     logger.error(fileurl + '下载失败');
-  //     logger.info('错误信息如下： \n' + err.message);
-  //     res.status(err.status).end();
+      return;
+    }
 
-  //     return;
-  //   }
-
-  //   logger.info(fileurl + '下载成功');
-  // });
+    logger.info(fileurl + '下载成功');
+  });
 });
 
 // TODO
