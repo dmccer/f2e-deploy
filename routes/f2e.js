@@ -100,6 +100,7 @@ router.post('/alpha', function (req, res) {
     }
   } catch(e) {
     // 暂不做处理，因为七牛服务器不接受 html 文件，所以导致错误
+    logger.fatal('七牛传输 html 文件失败');
     logger.info(e);
   }
 
@@ -111,7 +112,6 @@ router.post('/alpha', function (req, res) {
 
   // 进入静态服务器目录
   shell.cd(path.dirname(dest_dir));
-  console.log(shell.pwd());
 
   var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + pkg.version);
   var tar_gz_tip_prefix = '生成静态资源压缩包' + path.resolve(dest_dir, pkg.version);
