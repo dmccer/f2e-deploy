@@ -32,7 +32,7 @@ router.get('/alpha/:name', function(req, res) {
     });
   }
 
-  res.download(fileurl, name + '.tar.gz', function(err) {
+  res.download(fileurl, name + '-' + pkg.version + '.tar.gz', function(err) {
     if (err) {
       logger.error(fileurl + '下载失败');
       logger.info('错误信息如下： \n' + err.message);
@@ -116,7 +116,7 @@ router.post('/alpha', function (req, res) {
   shell.cd(path.dirname(dest_dir));
   console.log(shell.pwd());
 
-  var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + dest_dir);
+  var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + pkg.version);
   var tar_gz_tip_prefix = '生成静态资源压缩包' + path.resolve(dest_dir, pkg.version);
 
   if (tar_gz.code !== 0) {
