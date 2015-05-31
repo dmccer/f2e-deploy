@@ -123,7 +123,7 @@ router.post('/alpha', function (req, res) {
   shell.exec('cd ' + path.dirname(dest_dir));
 
   var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + dest_dir);
-  var tar_gz_tip_prefix = '生成静态资源压缩包' + path.resolve(des_dir, pkg.version);
+  var tar_gz_tip_prefix = '生成静态资源压缩包' + path.resolve(dest_dir, pkg.version);
 
   if (tar_gz.code !== 0) {
     var err_tip = tar_gz_tip_prefix + '失败';

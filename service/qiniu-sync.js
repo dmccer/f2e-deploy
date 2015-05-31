@@ -8,5 +8,5 @@ module.exports = function() {
  qconf_json.src = config.static_server.alpha;
   jf.writeFileSync(config.qiniu, qconf_json);
 
-  return shell.exec('qrsync ' + onfig.qiniu);
+  return shell.exec('qrsync ' + config.qiniu);
 };
