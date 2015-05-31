@@ -13,7 +13,8 @@ module.exports = function (params, callback) {
     form: {
       owner: params.owner,
       version: params.version,
-      url: params.url
+      url: params.url,
+      download: params.download
     },
     headers: {
       Authorization: config.vermgr.authorization
