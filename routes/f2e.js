@@ -45,9 +45,6 @@ router.get('/alpha/:name', function(req, res) {
   });
 });
 
-// TODO
-// 1. 工作区按 repos owner 分组
-// 2. 静态服务器按 respos owner 分组
 router.post('/alpha', function (req, res) {
   var repos = req.body.repository;
   var log_dir = 'log/' + repos.owner.username;
