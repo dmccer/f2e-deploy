@@ -52,6 +52,7 @@ module.exports = function(data, dest) {
 
     return;
   }
+  logger.info(curl_repos.output);
   logger.info('下载项目源码成功');
 
 
@@ -63,6 +64,7 @@ module.exports = function(data, dest) {
 
     return;
   }
+  logger.info(unzip_repos.output);
   logger.info('解压' + out_file + '完成');
 
   // 进入目录 out_dir
@@ -76,6 +78,7 @@ module.exports = function(data, dest) {
 
     return;
   }
+  logger.info(npm_prestart.output);
   logger.info('编译成功');
 
 

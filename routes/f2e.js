@@ -88,7 +88,6 @@ router.post('/alpha', function (req, res) {
 
     return;
   }
-
   logger.info('正在发布静态资源到七牛服务器...');
 
   try {
@@ -97,7 +96,16 @@ router.post('/alpha', function (req, res) {
     if (qiniu_sync_rs.code !== 0) {
       logger.error('上传静态资源到七牛服务器出错...');
       logger.error('错误信息:\n' + qiniu_sync_rs.output);
+
+      res.status(200).json({
+        code: 500,
+        data: '上传七牛服务器失败'
+      });
+
+      return;
     }
+    logger.info(qiniu_sync_rs);
+    logger.info('上传七牛成功');
   } catch(e) {
     // 暂不做处理，因为七牛服务器不接受 html 文件，所以导致错误
     logger.fatal('七牛传输 html 文件失败');
@@ -113,9 +121,8 @@ router.post('/alpha', function (req, res) {
   // 进入静态服务器目录
   shell.cd(path.dirname(dest_dir));
 
-  var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + pkg.version);
   var tar_gz_tip_prefix = '生成静态资源压缩包' + path.resolve(dest_dir, pkg.version);
-
+  var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + pkg.version);
   if (tar_gz.code !== 0) {
     var err_tip = tar_gz_tip_prefix + '失败';
 
@@ -129,6 +136,7 @@ router.post('/alpha', function (req, res) {
 
     return;
   }
+  logger.info(tar_gz.output);
   logger.info(tar_gz_tip_prefix + '成功');
 
   logger.info('正在更新版本数据库...');
