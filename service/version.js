@@ -33,7 +33,7 @@ module.exports = function (params, callback) {
       logger.fatal('写入版本到数据库失败');
       logger.info('status code: ' + res.statusCode);
       logger.info('response body: ' + body);
-      logger.info('错误信息: ' + err.message);
+      logger.info('错误信息: ' + (err && err.message));
     }
 
     callback();
