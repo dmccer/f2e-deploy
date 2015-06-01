@@ -14,6 +14,15 @@ router.get('/alpha/:name', function(req, res) {
   var logger = require('../logger')('log/down_gz.log', 'downgz');
   var owner = req.query.owner;
   var name = req.params.name;
+
+  if (!owner || !name) {
+    res.status(200).json({
+      data: owner + '或项目名称不能为空'
+    });
+
+    return;
+  }
+
   var repos_work_dir = path.resolve(config.alpha_work_path, owner, name);
   var deployed_dir = path.resolve(config.static_server.alpha, owner, name);
 
@@ -21,6 +30,8 @@ router.get('/alpha/:name', function(req, res) {
     res.status(200).json({
       data: owner + '/' + name + '项目不存在或从未发布'
     });
+
+    return;
   }
 
   var pkg = require(path.resolve(repos_work_dir, './package.json'));
@@ -30,6 +41,8 @@ router.get('/alpha/:name', function(req, res) {
     res.status(200).json({
       data: owner + '/' + name + '项目从未发布成功'
     });
+
+    return;
   }
 
   res.download(fileurl, name + '-' + pkg.version + '.tar.gz', function(err) {
