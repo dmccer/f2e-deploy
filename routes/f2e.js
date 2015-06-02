@@ -63,7 +63,19 @@ router.post('/alpha', function (req, res) {
   var repos = req.body.repository;
   var log_dir = 'log/' + repos.owner.username;
   var log_file = log_dir + '/' + repos.name + '.log';
-  shell.mkdir('-p ', log_dir);
+  var mkdir_log = shell.exec('mkdir -p ' + log_dir);
+
+  if (mkdir_log.code !== 0) {
+    console.error('创建 log dir: ' + log_dir + '失败');
+    console.log('错误信息:\n' + mkdir_log);
+
+    res.status(200).json({
+      data: '创建日志目录失败'
+    });
+
+    return;
+  }
+
   shell.exec('touch ' + log_file);
   shell.exec('> ' + log_file);
   var logger = require('../logger')(log_file, 'publish');
