@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var path = require('path');
+var fs = require('fs');
 var shell = require('shelljs');
 var config = require('../config');
 var build = require('../service/build');
@@ -62,9 +63,10 @@ router.post('/alpha', function (req, res) {
   var repos = req.body.repository;
   var log_dir = 'log/' + repos.owner.username;
   var log_file = log_dir + '/' + repos.name + '.log';
-  shell.exec('mkdir -p ' + log_dir);
-  shell.exec('touch ' + log_file);
-  shell.exec('> ' + log_file);
+  // shell.exec('mkdir -p ' + log_dir);
+  // shell.exec('touch ' + log_file);
+  // shell.exec('> ' + log_file);
+  fs.closeSync(fs.openSync(log_file, 'w'));
   var logger = require('../logger')(log_file, 'publish');
 
   logger.info('准备发布 alpha 环境...');
