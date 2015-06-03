@@ -69,7 +69,6 @@ router.post('/alpha', function (req, res) {
     env: 'alpha'
   });
 
-  logger.info('正在预处理静态资源...');
   deploger.emit('before-build');
   var build_rs = build(
     req.body,
@@ -77,7 +76,11 @@ router.post('/alpha', function (req, res) {
   );
 
   if (!build_rs) {
-    logger.fatal('预处理静态资源失败');
+    deploger.emit('build-err', {
+      msg: '预处理静态资源失败',
+      err: new Error('')
+    });
+
     return res.status(200).json({
       code: 500,
       data: '预处理静态资源过程中发生错误'

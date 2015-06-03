@@ -18,11 +18,12 @@ module.exports = function(data, dest) {
   var owner_name = data.repository.owner.username;
   var postfix = '.tar.gz';
 
-  logger.info('项目 git repos 信息:');
-  logger.info('repos name: ' + repos_name);
-  logger.info('repos url: ' + repos_url);
-  logger.info('commit id: ' + commit_id);
-  logger.info('owner name: ' + owner_name);
+  deploger.emit('display-repos', {
+    repos_name: repos_name,
+    repos_url: repos_url,
+    commit_id: commit_id,
+    owner_name: owner_name
+  });
 
   var tar_gz_url = [
     repos_url,
@@ -35,65 +36,65 @@ module.exports = function(data, dest) {
 
   var mk_out_dir = shell.exec('mkdir -p ' + out_dir);
   if (mk_out_dir.code !== 0) {
-    logger.fatal('创建预处理目录失败: ' + out_dir);
-    logger.info('错误信息:\n' + mk_out_dir.output);
+    deploger.emit('mk-out-dir-err', {
+      msg: '创建预处理目录失败: ' + out_dir,
+      err: new Error(mk_out_dir.output)
+    });
 
     return;
   }
-  logger.info('创建预处理目录成功: ' + out_dir);
+  deploger.emit('after-mk-out-dir', outdir);
 
-
-  logger.info('正在下载项目源码...');
   var curl_repos = shell.exec([
     'curl -o',
     out_file,
     tar_gz_url
   ].join(' '));
   if (curl_repos.code !== 0) {
-    logger.fatal('下载项目源码失败: ' + tar_gz_url);
-    logger.info('错误信息:\n' + curl_repos.output);
+    deploger.emit('curl-repos-err', {
+      msg: '下载源码失败: ' + tar_gz_url,
+      err: new Error(curl_repos.output)
+    });
 
     return;
   }
-  logger.info(curl_repos.output);
-  logger.info('下载项目源码成功');
+  deploger.emit('after-curl-repos', curl_repos.output, tar_gz_url, out_file);
 
-
-  logger.info('正在解压' + out_file);
   var unzip_repos = shell.exec(['tar zxvf', out_file, '-C', out_dir].join(' '));
   if (unzip_repos.code !== 0) {
-    logger.fatal('解压' + out_file + ' 失败');
-    logger.info('错误信息:\n' + unzip_repos.output);
+    deploger.emit('unzip-repos-err', {
+      msg: '解压' + out_file + ' 失败',
+      err: new Error(unzip_repos.output)
+    });
 
     return;
   }
-  logger.info(unzip_repos.output);
-  logger.info('解压' + out_file + '完成');
+  deploger.emit('after-unzip-repos', output, out_dir, out_file);
 
   // 进入目录 out_dir
   shell.cd(out_dir);
 
-  logger.info('正在编译...');
   var npm_prestart = shell.exec('npm run prestart');
   if (npm_prestart.code !== 0) {
-    logger.fatal('编译失败: npm run prestart');
-    logger.info('错误信息:\n' + npm_prestart.output);
+    deploger.emit('npm-prestart-err', {
+      msg: '编译失败: npm run prestart',
+      err: new Error(npm_prestart.output)
+    });
 
     return;
   }
-  logger.info(npm_prestart.output);
-  logger.info('编译成功');
+  deploger.emit('after-npm-prestart', output, out_file);
 
-
-  logger.info('正在删除' + out_file + '...');
   var rm_zip = shell.exec(['rm', '-rf', out_file].join(' '));
   if (rm_zip.code !== 0) {
-    logger.fatal('删除' + out_file + '失败');
-    logger.info('错误信息:\n' + rm_zip.output);
+    deploger.emit('rm-zip-err', {
+      msg: '删除' + out_file + '失败',
+      err: new Error(rm_zip.output)
+    });
 
     return;
   }
-  logger.info('删除' + out_file + '成功');
+  deploger.emit('after-rm-zip', out_file);
 
   return {
     out_dir: out_dir,
