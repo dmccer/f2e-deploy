@@ -19,13 +19,14 @@ var errHandler = function(logger, data) {
 // 创建 log 文件，初始化 logger
 deploger
   .on('before-deploy', function(data) {
-    mk_log(data.log_dir, data.log_file);
-
     publish_logger = require('../logger')(path.join(data.log_dir, data.log_file), 'publish');
     publish_logger.trace('发布' + data.env + ' 环境中');
 
     build_logger = log4js.getLogger('build');
   })
+  .on('mkdir-log-err', errHandler.bind(null, publish_logger))
+  .on('touch-logfile-err', errHandler.bind(null, publish_logger))
+  .on('clear-logfile-err', errHandler.bind(null, publish_logger))
   .on('before-build', function() {
     publish_logger.trace('正在预处理静态资源...');
   })
@@ -66,50 +67,7 @@ deploger
     logger.info('删除' + outfile + '成功');
   })
   .on('build-err', errHandler.bind(null, build_logger))
-  ;
-
-function mk_log(log_dir, log_file) {
-  log_file = path.join(log_dir, log_file);
-
-  var mkdir_log = shell.exec('mkdir -p ' + log_dir);
-  if (mkdir_log.code !== 0) {
-    deploger.emit('mkdir-log-err', {
-      msg: '创建 log dir: ' + log_dir + '失败',
-      err: new Error(mkdir_log.output)
-    });
-
-    res.status(200).json({
-      data: '创建日志目录失败'
-    });
-
-    return;
-  }
-
-  var touch_logfile = shell.exec('touch ' + log_file);
-  if (touch_logfile.code !== 0) {
-    deploger.emit('touch-logfile-err', {
-      msg: '创建 log file: ' + log_file + '失败',
-      err: new Error(touch_logfile.output)
-    });
-
-    res.status(200).json({
-      data: '创建日志文件失败'
-    });
-
-    return;
-  }
-
-  var clear_logfile = shell.exec('> ' + log_file);
-  if (clear_logfile.code !== 0) {
-    deploger.emit('clear-logfile-err', {
-      msg: '清除 log file: ' + log_file + '失败',
-      err: new Error(clear_logfile.output)
-    });
-
-    res.status(200).json({
-      data: '清除日志文件失败'
-    });
-
-    return;
-  }
-}
+  .on('after-build', function() {
+    build_logger.info('预处理静态资源完成');
+  })
+;

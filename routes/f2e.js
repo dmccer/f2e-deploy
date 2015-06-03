@@ -63,9 +63,21 @@ router.get('/alpha/:name', function(req, res) {
 router.post('/alpha', function (req, res) {
   var repos = req.body.repository;
 
+  var log_dir = path.join('log/', repos.owner.username);
+  var log_file = repos.name + '.log';
+
+  try {
+    mk_log(log_dir, log_file);
+  } catch(e) {
+    return res.status(200).json({
+      code: 500,
+      data: e.message
+    });
+  }
+
   deploger.emit('before-deploy', {
-    log_dir: path.join('log/', repos.owner.username),
-    log_file: repos.name + '.log',
+    log_dir: log_dir,
+    log_file: log_file,
     env: 'alpha'
   });
 
@@ -86,6 +98,8 @@ router.post('/alpha', function (req, res) {
       data: '预处理静态资源过程中发生错误'
     });
   }
+
+  deploger.emit('after-build');
 
   logger.info('预处理静态资源完成');
 
@@ -180,4 +194,36 @@ router.post('/alpha', function (req, res) {
   });
 });
 
+function mk_log(log_dir, log_file) {
+  log_file = path.join(log_dir, log_file);
 
+  var mkdir_log = shell.exec('mkdir -p ' + log_dir);
+  if (mkdir_log.code !== 0) {
+    deploger.emit('mkdir-log-err', {
+      msg: '创建 log dir: ' + log_dir + '失败',
+      err: new Error(mkdir_log.output)
+    });
+
+    throw new Error('创建日志目录' + log_dir + '失败');
+  }
+
+  var touch_logfile = shell.exec('touch ' + log_file);
+  if (touch_logfile.code !== 0) {
+    deploger.emit('touch-logfile-err', {
+      msg: '创建 log file: ' + log_file + '失败',
+      err: new Error(touch_logfile.output)
+    });
+
+    throw new Error('创建日志文件' + log_file + '失败');
+  }
+
+  var clear_logfile = shell.exec('> ' + log_file);
+  if (clear_logfile.code !== 0) {
+    deploger.emit('clear-logfile-err', {
+      msg: '清除 log file: ' + log_file + '失败',
+      err: new Error(clear_logfile.output)
+    });
+
+    throw new Error('清空日志文件' + log_file + '失败');
+  }
+}
