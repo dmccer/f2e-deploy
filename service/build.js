@@ -1,11 +1,14 @@
 var shell = require('shelljs');
 var path = require('path');
+var deploger = require('./deploger');
 
 module.exports = function(data, dest) {
-  var logger = require('../logger')('log/' + data.repository.owner.username + '/' + data.repository.name + '.log', 'build');
-
   if (!data || !data.commits.length) {
-    logger.fatal('缺少 commit 信息');
+    deploger.emit('build-param-err', {
+      msg: '缺少 commit 信息',
+      err: new Error('missing build params: commit')
+    });
+
     return;
   }
 

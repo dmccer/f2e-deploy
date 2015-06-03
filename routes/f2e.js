@@ -8,6 +8,7 @@ var build = require('../service/build');
 var origin_sync = require('../service/origin_sync');
 var qiniu_sync = require('../service/qiniu-sync');
 var version = require('../service/version');
+var deploger = require('../service/deploger');
 
 module.exports = router;
 
@@ -61,27 +62,15 @@ router.get('/alpha/:name', function(req, res) {
 
 router.post('/alpha', function (req, res) {
   var repos = req.body.repository;
-  var log_dir = 'log/' + repos.owner.username;
-  var log_file = log_dir + '/' + repos.name + '.log';
-  var mkdir_log = shell.exec('mkdir -p ' + log_dir);
 
-  if (mkdir_log.code !== 0) {
-    console.error('创建 log dir: ' + log_dir + '失败');
-    console.log('错误信息:\n' + mkdir_log);
+  deploger.emit('before-deploy', {
+    log_dir: path.join('log/', repos.owner.username),
+    log_file: repos.name + '.log',
+    env: 'alpha'
+  });
 
-    res.status(200).json({
-      data: '创建日志目录失败'
-    });
-
-    return;
-  }
-
-  shell.exec('touch ' + log_file);
-  shell.exec('> ' + log_file);
-  var logger = require('../logger')(log_file, 'publish');
-
-  logger.info('准备发布 alpha 环境...');
   logger.info('正在预处理静态资源...');
+  deploger.emit('before-build');
   var build_rs = build(
     req.body,
     config.alpha_work_path
@@ -187,3 +176,5 @@ router.post('/alpha', function (req, res) {
     });
   });
 });
+
+
