@@ -1,5 +1,6 @@
 var shell = require('shelljs');
 var path = require('path');
+var _ = require('lodash');
 var Deploger = require('./deploger');
 
 module.exports = function(data, dest) {
@@ -115,8 +116,16 @@ function build(deploger, data, dest) {
 function validate(deploger, data, dest) {
   var err, err_msg;
 
-  if (!data || !data.commits || !data.commits.length) {
-    err_msg = '缺少 commit 信息';
+  if (!data) {
+    err_msg = '未传入参数';
+  } else if (!data.commits || !data.commits.length) {
+    err_msg = '参数缺少 commits 字段信息';
+  } else if (!data.repository || !data.repository.name || !data.repository.owner || !data.repository.owner.username || _.trim(data.repository.name) === '' || _.trim(data.repository.owner.username) === '') {
+    err_msg = '参数缺少 repository 字段信息';
+  }
+
+  console.log(err_msg);
+  if (err_msg) {
     err = new Error(err_msg);
 
     deploger.emit('build-param-err', {

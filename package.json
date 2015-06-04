@@ -23,6 +23,7 @@
     "body-parser": "^1.12.2",
     "express": "^4.12.3",
     "jsonfile": "^2.0.0",
+    "lodash": "^3.9.3",
     "log4js": "^0.6.25",
     "request": "^2.55.0",
     "serve-favicon": "^2.2.1",
