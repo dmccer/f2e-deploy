@@ -1,6 +1,7 @@
 dist/
 semantic/dist/
-.DS_Store
+deploy/
+log/
 qconf.json
 config.js
 

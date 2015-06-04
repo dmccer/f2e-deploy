@@ -1,10 +1,11 @@
 var express = require('express');
 var favicon = require('serve-favicon');
 var bodyParser = require('body-parser');
-var f2e = require('./routes/f2e');
-var auth_service = require('./service/authorization');
 var log4js = require('log4js');
 var logger = require('./logger')('log/deploy.log', 'deploy');
+var api = require('./api');
+var auth_service = require('./service/authorization');
+
 var app = express();
 
 app.use(favicon(__dirname + '/favicon.png'));
@@ -26,7 +27,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use('/f2e', f2e);
+app.use('/f2e', api);
 
 var server = app.listen(9999, function () {
 

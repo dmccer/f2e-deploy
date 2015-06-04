@@ -1,7 +1,4 @@
-var express = require('express');
-var router = express.Router();
 var path = require('path');
-var fs = require('fs');
 var shell = require('shelljs');
 var config = require('../config');
 var build = require('../service/build');
@@ -10,61 +7,17 @@ var qiniu_sync = require('../service/qiniu-sync');
 var version = require('../service/version');
 var deploger = require('../service/deploger');
 
-module.exports = router;
-
-router.get('/alpha/:name', function(req, res) {
-  var logger = require('../logger')('log/down_gz.log', 'downgz');
-  var owner = req.query.owner;
-  var name = req.params.name;
-
-  if (!owner || !name) {
-    res.status(200).json({
-      data: owner + '或项目名称不能为空'
-    });
-
-    return;
-  }
-
-  var repos_work_dir = path.resolve(config.alpha_work_path, owner, name);
-  var deployed_dir = path.resolve(config.static_server.alpha, owner, name);
-
-  if (!shell.test('-e', repos_work_dir)) {
-    res.status(200).json({
-      data: owner + '/' + name + '项目不存在或从未发布'
-    });
-
-    return;
-  }
-
-  var pkg = require(path.resolve(repos_work_dir, './package.json'));
-  var filename = pkg.version + '.tar.gz';
-  var fileurl = path.resolve(deployed_dir, filename);
-  if (!shell.test('-f', fileurl)) {
-    res.status(200).json({
-      data: owner + '/' + name + '项目从未发布成功'
-    });
-
-    return;
-  }
-
-  res.download(fileurl, name + '-' + pkg.version + '.tar.gz', function(err) {
-    if (err) {
-      logger.error(fileurl + '下载失败');
-      logger.info('错误信息如下： \n' + err.message);
-      res.status(err.status).end();
-
-      return;
-    }
-
-    logger.info(fileurl + '下载成功');
-  });
-});
-
-router.post('/alpha', function (req, res) {
+module.exports = function (req, res) {
   var repos = req.body.repository;
 
   var log_dir = path.join('log/', repos.owner.username);
   var log_file = repos.name + '.log';
+
+  deploger.emit('before-deploy', {
+    log_dir: log_dir,
+    log_file: log_file,
+    env: 'alpha'
+  });
 
   try {
     mk_log(log_dir, log_file);
@@ -74,12 +27,6 @@ router.post('/alpha', function (req, res) {
       data: e.message
     });
   }
-
-  deploger.emit('before-deploy', {
-    log_dir: log_dir,
-    log_file: log_file,
-    env: 'alpha'
-  });
 
   deploger.emit('before-build');
   var build_rs = build(
@@ -100,8 +47,6 @@ router.post('/alpha', function (req, res) {
   }
 
   deploger.emit('after-build');
-
-  logger.info('预处理静态资源完成');
 
   var pkg = require(path.resolve(build_rs.out_dir, './package.json'));
   var src = path.resolve(build_rs.out_dir, pkg.dest, './*');
@@ -192,38 +137,48 @@ router.post('/alpha', function (req, res) {
       data: '项目发布成功'
     });
   });
-});
+};
 
 function mk_log(log_dir, log_file) {
+  var err_msg;
+
   log_file = path.join(log_dir, log_file);
 
   var mkdir_log = shell.exec('mkdir -p ' + log_dir);
   if (mkdir_log.code !== 0) {
+    err_msg = '创建日志目录' + log_dir + '失败';
+
     deploger.emit('mkdir-log-err', {
-      msg: '创建 log dir: ' + log_dir + '失败',
+      msg: err_msg,
       err: new Error(mkdir_log.output)
     });
 
-    throw new Error('创建日志目录' + log_dir + '失败');
+    throw new Error(err_msg);
   }
 
-  var touch_logfile = shell.exec('touch ' + log_file);
-  if (touch_logfile.code !== 0) {
-    deploger.emit('touch-logfile-err', {
-      msg: '创建 log file: ' + log_file + '失败',
-      err: new Error(touch_logfile.output)
-    });
+  shell.exec('touch ' + log_file)
 
-    throw new Error('创建日志文件' + log_file + '失败');
-  }
+  // var touch_logfile = shell.exec('touch ' + log_file);
+  // if (touch_logfile.code !== 0) {
+  //   err_msg = '创建日志文件' + log_file + '失败';
+
+  //   deploger.emit('touch-logfile-err', {
+  //     msg: err_msg,
+  //     err: new Error(touch_logfile.output)
+  //   });
+
+  //   throw new Error(err_msg);
+  // }
 
   var clear_logfile = shell.exec('> ' + log_file);
   if (clear_logfile.code !== 0) {
+    err_msg = '清空日志文件' + log_file + '失败';
+
     deploger.emit('clear-logfile-err', {
-      msg: '清除 log file: ' + log_file + '失败',
+      msg: err_msg,
       err: new Error(clear_logfile.output)
     });
 
-    throw new Error('清空日志文件' + log_file + '失败');
+    throw new Error(err_msg);
   }
 }

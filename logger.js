@@ -12,7 +12,7 @@ module.exports = function(file, category) {
         category: category
       }
     ],
-    replaceConsole: true
+    replaceConsole: false
   });
 
   return log4js.getLogger(category);

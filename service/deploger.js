@@ -1,12 +1,12 @@
 var log4js = require('log4js');
-var util = require('util');
+var logger = require('../logger')('test/deploy.log', 'deploy');
 var EventEmitter = require('events').EventEmitter;
 
-function deploger() {
-  EventEmitter.call(this);
+ function Singleton() {
+  return Singleton.ins = Singleton.ins || new EventEmitter();
 }
 
-util.inherits(deploger, EventEmitter);
+var deploger = Singleton();
 
 module.exports = deploger;
 
@@ -24,9 +24,9 @@ deploger
 
     build_logger = log4js.getLogger('build');
   })
-  .on('mkdir-log-err', errHandler.bind(null, publish_logger))
-  .on('touch-logfile-err', errHandler.bind(null, publish_logger))
-  .on('clear-logfile-err', errHandler.bind(null, publish_logger))
+  .on('mkdir-log-err', errHandler.bind(null, logger))
+  .on('touch-logfile-err', errHandler.bind(null, logger))
+  .on('clear-logfile-err', errHandler.bind(null, logger))
   .on('before-build', function() {
     publish_logger.trace('正在预处理静态资源...');
   })
