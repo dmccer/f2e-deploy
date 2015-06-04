@@ -65,10 +65,12 @@ function build(deploger, data, dest) {
     tar_gz_url
   ].join(' '));
   if (curl_repos.code !== 0) {
-    err = new Error(curl_repos.output);
+    err_msg = '下载' + tar_gz_url + '失败';
+    err = new Error(err_msg);
+
     deploger.emit('curl-repos-err', {
-      msg: '下载源码失败: ' + tar_gz_url,
-      err: err
+      msg: '下载' + tar_gz_url + '失败',
+      err: new Error(curl_repos.output)
     });
 
     throw err;

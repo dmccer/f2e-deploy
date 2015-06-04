@@ -16,8 +16,8 @@ describe('service/build.js', function() {
       id: '5f69e7cedd45fcce5ea8f3116e9e20f15e90dafb'
     }],
     repository: {
-      name: 'test',
-      url: 'http://git.guluabc.com/f2e/test',
+      name: 'itest',
+      url: 'https://git.guluabc.com/f2e/itest',
       owner: {
         username: 'f2e'
       }
@@ -80,12 +80,20 @@ describe('service/build.js', function() {
     });
 
     it('should throw error and msg when mkdir failed', function() {
-      var outdir = path.resolve(dest, data.repository.owner.username, data.repository.name);
+      var out_parent_dir = path.join(dest, data.repository.owner.username);
+      var outdir = path.resolve(out_parent_dir, data.repository.name);
 
-      shell.exec('mkdir -p ' + path.join(dest, data.repository.owner.username));
+      shell.exec('rm -rf ' + out_parent_dir);
+      shell.exec('mkdir -p ' + out_parent_dir);
       shell.exec('touch ' + outdir);
 
       assert.throws(build.bind(null, deploger, data, dest), '创建预处理目录' + outdir + '失败');
+
+      shell.exec('rm -rf ' + out_parent_dir);
+    });
+
+    it('should throw error and msg when curl repos failed', function() {
+      assert.throws(build.bind(null, deploger, data, dest), '下载' + [data.repository.url, 'archive', data.commits[0].id + '.tar.gz'].join('/') + '失败');
     });
 
   });
