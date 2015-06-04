@@ -68,6 +68,25 @@ describe('service/build.js', function() {
   });
 
   describe('.build()', function() {
+    var deploger;
+    var build = builder.__get__('build');
+
+    before(function() {
+      shell.exec('mkdir -p ' + log_dir);
+      shell.exec('touch ' + log_file_relative);
+      shell.exec('> ' + log_file_relative);
+
+      deploger = new Deploger(log_file_relative, 'build');
+    });
+
+    it('should throw error and msg when mkdir failed', function() {
+      var outdir = path.resolve(dest, data.repository.owner.username, data.repository.name);
+
+      shell.exec('mkdir -p ' + outdir);
+      shell.exec('touch ' + path.resolve(dest, data.repository.owner.username));
+
+      assert.throws(build.bind(null, deploger, data, dest), '创建预处理目录' + outdir + '失败');
+    });
 
   });
 

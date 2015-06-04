@@ -43,17 +43,21 @@ function build(deploger, data, dest) {
   var out_dir = path.resolve(dest, owner_name, repos_name);
   var out_file = out_dir + postfix;
 
+  var err, err_msg;
+
   var mk_out_dir = shell.exec('mkdir -p ' + out_dir);
   if (mk_out_dir.code !== 0) {
-    err = new Error(mk_out_dir.output);
+    err_msg = '创建预处理目录' + out_dir + '失败';
+    err = new Error(err_msg);
+
     deploger.emit('mk-out-dir-err', {
-      msg: '创建预处理目录失败: ' + out_dir,
+      msg: err_msg,
       err: err
     });
 
     throw err;
   }
-  deploger.emit('after-mk-out-dir', outdir);
+  deploger.emit('after-mk-out-dir', out_dir);
 
   var curl_repos = shell.exec([
     'curl -o',
