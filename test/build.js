@@ -82,8 +82,8 @@ describe('service/build.js', function() {
     it('should throw error and msg when mkdir failed', function() {
       var outdir = path.resolve(dest, data.repository.owner.username, data.repository.name);
 
-      shell.exec('mkdir -p ' + outdir);
-      shell.exec('touch ' + path.resolve(dest, data.repository.owner.username));
+      shell.exec('mkdir -p ' + path.join(dest, data.repository.owner.username));
+      shell.exec('touch ' + outdir);
 
       assert.throws(build.bind(null, deploger, data, dest), '创建预处理目录' + outdir + '失败');
     });
