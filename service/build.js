@@ -124,7 +124,6 @@ function validate(deploger, data, dest) {
     err_msg = '参数缺少 repository 字段信息';
   }
 
-  console.log(err_msg);
   if (err_msg) {
     err = new Error(err_msg);
 
