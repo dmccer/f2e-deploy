@@ -7,7 +7,7 @@ var fs = require('fs');
 var rewire = require('rewire');
 var shell = require('shelljs');
 
-var deploger = require('../service/deploger');
+var Deploger = require('../service/deploger');
 var deploy = rewire('../controller/deploy');
 
 describe('controller/deploy.js', function() {
@@ -17,6 +17,11 @@ describe('controller/deploy.js', function() {
   var log_file = 'test.log';
   var log_file_relative = path.join(log_dir, log_file);
 
+  shell.exec('mkdir -p log');
+  shell.exec('touch log/deploy.log');
+  shell.exec('> log/deploy.log');
+
+  var deploger = new Deploger('log/deploy.log', 'deploy');
   describe('.mk_log', function() {
     afterEach(function() {
       // 清理, 还原
@@ -24,7 +29,7 @@ describe('controller/deploy.js', function() {
     });
 
     it('should create dir and file when not exists', function() {
-      mk_log(log_dir, log_file);
+      mk_log(deploger, log_dir, log_file);
 
       assert.isTrue(fs.existsSync(log_file_relative), '文件 log/f2e/test.log 存在');
     });
@@ -34,7 +39,7 @@ describe('controller/deploy.js', function() {
       shell.exec('touch log/f2e/test.log');
       shell.exec('echo "this is content" > log/f2e/test.log');
 
-      mk_log(log_dir, log_file);
+      mk_log(deploger, log_dir, log_file);
 
       assert.lengthOf(fs.readFileSync(log_file_relative, { encoding: 'utf8' }), 0, '文件内容为空');
     });
@@ -42,13 +47,13 @@ describe('controller/deploy.js', function() {
     it('should throw error and message when mk dir failed', function() {
       shell.exec('touch log');
 
-      assert.throws(mk_log.bind(null, log_dir, log_file), '创建日志目录' + log_dir + '失败');
+      assert.throws(mk_log.bind(null, deploger, log_dir, log_file), '创建日志目录' + log_dir + '失败');
     });
 
     it('should throw error and message when clear file content failed', function() {
       shell.exec('mkdir -p log/f2e/test.log');
 
-      assert.throws(mk_log.bind(null, log_dir, log_file), '清空日志文件' + path.join(log_dir, log_file) + '失败');
+      assert.throws(mk_log.bind(null, deploger, log_dir, log_file), '清空日志文件' + path.join(log_dir, log_file) + '失败');
     });
   });
 });

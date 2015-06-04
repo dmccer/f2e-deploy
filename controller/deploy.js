@@ -5,13 +5,15 @@ var build = require('../service/build');
 var origin_sync = require('../service/origin_sync');
 var qiniu_sync = require('../service/qiniu-sync');
 var version = require('../service/version');
-var deploger = require('../service/deploger');
+var Deploger = require('../service/deploger');
 
 module.exports = function (req, res) {
   var repos = req.body.repository;
 
   var log_dir = path.join('log/', repos.owner.username);
   var log_file = repos.name + '.log';
+
+  var deploger = new Deploger(log_dir, log_file);
 
   deploger.emit('before-deploy', {
     log_dir: log_dir,
@@ -20,7 +22,7 @@ module.exports = function (req, res) {
   });
 
   try {
-    mk_log(log_dir, log_file);
+    mk_log(deploger, log_dir, log_file);
   } catch(e) {
     return res.status(200).json({
       code: 500,
@@ -139,7 +141,7 @@ module.exports = function (req, res) {
   });
 };
 
-function mk_log(log_dir, log_file) {
+function mk_log(deploger, log_dir, log_file) {
   var err_msg;
 
   log_file = path.join(log_dir, log_file);
