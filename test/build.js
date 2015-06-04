@@ -13,11 +13,11 @@ var Deploger = require('../service/deploger');
 describe('service/build.js', function() {
   var data = {
     commits: [{
-      id: '5f69e7cedd45fcce5ea8f3116e9e20f15e90dafb'
+      id: '8d06a3c48f8a22e94263fdd36298b6cfabc5c201'
     }],
     repository: {
-      name: 'itest',
-      url: 'https://git.guluabc.com/f2e/itest',
+      name: 'demigod',
+      url: 'http://git.guluabc.com/f2e/demigod',
       owner: {
         username: 'f2e'
       }
@@ -71,6 +71,10 @@ describe('service/build.js', function() {
     var deploger;
     var build = builder.__get__('build');
 
+    var out_parent_dir = path.join(dest, data.repository.owner.username);
+    var outdir = path.resolve(out_parent_dir, data.repository.name);
+    var outfile = outdir + '.tar.gz';
+
     before(function() {
       shell.exec('mkdir -p ' + log_dir);
       shell.exec('touch ' + log_file_relative);
@@ -80,9 +84,6 @@ describe('service/build.js', function() {
     });
 
     it('should throw error and msg when mkdir failed', function() {
-      var out_parent_dir = path.join(dest, data.repository.owner.username);
-      var outdir = path.resolve(out_parent_dir, data.repository.name);
-
       shell.exec('rm -rf ' + out_parent_dir);
       shell.exec('mkdir -p ' + out_parent_dir);
       shell.exec('touch ' + outdir);
@@ -93,7 +94,20 @@ describe('service/build.js', function() {
     });
 
     it('should throw error and msg when curl repos failed', function() {
+      var url = data.repository.url;
+      data.repository.url = 'https://git.guluabc.com';
+
       assert.throws(build.bind(null, deploger, data, dest), '下载' + [data.repository.url, 'archive', data.commits[0].id + '.tar.gz'].join('/') + '失败');
+
+      data.repository.url = url;
+    });
+
+    it('should throw error and msg when tar failed', function() {
+      deploger.on('after-curl-repos', function(output, targz_url, outfile) {
+        shell.exec('rm -rf ' + outfile);
+      });
+
+      assert.throws(build.bind(null, deploger, data, dest), '解压' + outfile + '失败');
     });
 
   });

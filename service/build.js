@@ -79,10 +79,11 @@ function build(deploger, data, dest) {
 
   var unzip_repos = shell.exec(['tar zxvf', out_file, '-C', out_dir].join(' '));
   if (unzip_repos.code !== 0) {
-    err = new Error(unzip_repos.output);
+    err_msg = '解压' + out_file + '失败';
+    err = new Error(err_msg);
     deploger.emit('unzip-repos-err', {
-      msg: '解压' + out_file + ' 失败',
-      err: err
+      msg: err_msg,
+      err: new Error(unzip_repos.output)
     });
 
     throw err;
