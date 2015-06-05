@@ -103,12 +103,29 @@ describe('service/build.js', function() {
     });
 
     it('should throw error and msg when tar failed', function() {
-      deploger.on('after-curl-repos', function(output, targz_url, outfile) {
-        shell.exec('rm -rf ' + outfile);
-      });
+      var listener = function(output, targz_url, outfile) {
+        shell.exec('mv ' + outfile + ' ' + outfile + '.bak');
+      };
+      deploger.on('after-curl-repos', listener);
 
       assert.throws(build.bind(null, deploger, data, dest), '解压' + outfile + '失败');
+
+      shell.exec('mv ' + outfile + '.bak ' + outfile);
+      deploger.removeListener('after-curl-repos', listener);
     });
+
+    it('should throw error when compile failed', function() {
+      var listener = function(output, outdir, outfile) {
+        shell.exec('mv ' + outdir + '/package.json' + ' ' + outdir + '/package.json.bak');
+      };
+      deploger.on('after-unzip-repos', listener);
+
+      assert.throws(build.bind(null, deploger, data, dest), '编译失败: npm run prestart');
+
+      shell.exec('mv ' + outdir + '/package.json.bak' + ' ' + outdir + '/package.json');
+      deploger.removeListener('after-unzip-repos', listener);
+    });
+
 
   });
 

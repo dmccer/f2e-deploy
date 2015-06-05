@@ -88,22 +88,24 @@ function build(deploger, data, dest) {
 
     throw err;
   }
-  deploger.emit('after-unzip-repos', output, out_dir, out_file);
+  deploger.emit('after-unzip-repos', unzip_repos.output, out_dir, out_file);
 
   // 进入目录 out_dir
   shell.cd(out_dir);
 
   var npm_prestart = shell.exec('npm run prestart');
   if (npm_prestart.code !== 0) {
-    err = new Error(npm_prestart.output);
+    err_msg = '编译失败: npm run prestart';
+    err = new Error(err_msg);
+
     deploger.emit('npm-prestart-err', {
-      msg: '编译失败: npm run prestart',
-      err: err
+      msg: err_msg,
+      err: new Error(npm_prestart.output)
     });
 
     throw err;
   }
-  deploger.emit('after-npm-prestart', output, out_file);
+  deploger.emit('after-npm-prestart', npm_prestart.output, out_file);
 
   var rm_zip = shell.exec(['rm', '-rf', out_file].join(' '));
   if (rm_zip.code !== 0) {
