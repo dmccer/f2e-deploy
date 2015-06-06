@@ -1,6 +1,7 @@
 var shell = require('shelljs');
 var path = require('path');
 var _ = require('lodash');
+var config = require('../config');
 var Deploger = require('./deploger');
 
 module.exports = function(data, dest) {
@@ -103,16 +104,19 @@ function build(deploger, data, dest) {
       err: new Error(npm_prestart.output)
     });
 
+    shell.cd(config.root);
+
     throw err;
   }
   deploger.emit('after-npm-prestart', npm_prestart.output, out_file);
 
   var rm_zip = shell.exec(['rm', '-rf', out_file].join(' '));
   if (rm_zip.code !== 0) {
-    err = new Error(rm_zip.output);
+    err_msg = '删除' + out_file + '失败';
+    err = new Error(err_msg);
     deploger.emit('rm-zip-err', {
-      msg: '删除' + out_file + '失败',
-      err: err
+      msg: err_msg,
+      err: new Error(rm_zip.output)
     });
 
     throw err;

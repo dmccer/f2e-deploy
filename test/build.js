@@ -83,7 +83,9 @@ describe('service/build.js', function() {
       deploger = new Deploger(log_file_relative, 'build');
     });
 
-    it('should throw error and msg when mkdir failed', function() {
+    it('should throw error and msg when mkdir failed', function(done) {
+      this.timeout(10000);
+
       shell.exec('rm -rf ' + out_parent_dir);
       shell.exec('mkdir -p ' + out_parent_dir);
       shell.exec('touch ' + outdir);
@@ -91,6 +93,8 @@ describe('service/build.js', function() {
       assert.throws(build.bind(null, deploger, data, dest), '创建预处理目录' + outdir + '失败');
 
       shell.exec('rm -rf ' + out_parent_dir);
+
+      done();
     });
 
     it('should throw error and msg when curl repos failed', function() {
@@ -126,6 +130,25 @@ describe('service/build.js', function() {
       deploger.removeListener('after-unzip-repos', listener);
     });
 
+    // it('should throw error when rm -rf zip failed', function() {
+    //   var listener = function(output, outfile) {
+    //     shell.exec('sudo chown -R root:admin ' + outfile);
+    //   };
+    //   deploger.on('after-npm-prestart', listener);
+
+    //   assert.throws(build.bind(null, deploger, data, dest), '删除' + outfile + '失败');
+
+    //   shell.exec('sudo chown -R kane:staff ' + outfile);
+    //   shell.exec('rm -rf ' + outfile);
+    // });
+
+    it('should return correct outdir when build complete', function(done) {
+      this.timeout(1200000);
+
+      assert.equal(build(deploger, data, dest), outdir, 'returned correct outdir');
+
+      done();
+    });
 
   });
 
