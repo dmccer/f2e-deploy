@@ -2,7 +2,7 @@ var path = require('path');
 var shell = require('shelljs');
 var config = require('../config');
 var build = require('../service/build');
-var origin_sync = require('../service/origin_sync');
+var origin_sync = require('../service/origin-sync');
 var qiniu_sync = require('../service/qiniu-sync');
 var version = require('../service/version');
 var Deploger = require('../service/deploger');
@@ -14,6 +14,9 @@ module.exports = function (req, res) {
   var log_file = repos.name + '.log';
 
   var deploger = new Deploger(log_dir, log_file);
+  var err_msg, err;
+
+  deploy_log_listener(deploger);
 
   deploger.emit('before-deploy', {
     log_dir: log_dir,
@@ -22,51 +25,66 @@ module.exports = function (req, res) {
   });
 
   try {
+    // 创建日志文件
     mk_log(deploger, log_dir, log_file);
   } catch(e) {
+    err_msg = '步骤1失败: 创建日志目录或文件';
+    err = new Error(err_msg);
+
+    deploger.emit('mk-log-err', {
+      msg: err_msg,
+      err: err
+    });
+
     return res.status(200).json({
       code: 500,
-      data: e.message
+      data: err_msg
     });
   }
 
+  // build 项目
   deploger.emit('before-build');
-  var build_rs = build(
-    req.body,
-    config.alpha_work_path
-  );
+  try {
+    var build_rs = build(
+      req.body,
+      config.alpha_work_path
+    );
+  } catch(e) {
+    err_msg = '步骤2失败: build 项目';
+    err = new Error(err_msg);
 
-  if (!build_rs) {
     deploger.emit('build-err', {
-      msg: '预处理静态资源失败',
-      err: new Error('')
+      msg: err_msg,
+      err: err
     });
 
     return res.status(200).json({
       code: 500,
-      data: '预处理静态资源过程中发生错误'
+      data: err_msg
     });
   }
-
   deploger.emit('after-build');
 
+  // 项目 package.json
   var pkg = require(path.resolve(build_rs.out_dir, './package.json'));
-  var src = path.resolve(build_rs.out_dir, pkg.dest, './*');
-  var dest_dir = path.resolve(config.static_server.alpha, repos.owner.username, pkg.name, pkg.version);
 
-  logger.info('正在发布静态资源到服务器...');
-  var origin_sync_rs = origin_sync(src, dest_dir);
-  if (origin_sync_rs.code !== 0) {
-    logger.fatal('静态资源发布到服务器失败');
-    logger.info('错误信息:\n' + origin_sync_rs.output);
+  try {
+    origin_sync(deploger, pkg, build_rs);
+  } catch(e) {
+    err_msg = '步骤3失败: 发布到静态资源服务器';
+    err = new Error(err_msg);
+
+    deploger.emit('origin-sync-err', {
+      msg: err_msg,
+      err: err
+    });
 
     res.status(200).json({
       code: 500,
-      data: '静态资源发布到服务器失败'
+      data: err_msg
     });
-
-    return;
   }
+
   logger.info('正在发布静态资源到七牛服务器...');
 
   try {
@@ -158,7 +176,7 @@ function mk_log(deploger, log_dir, log_file) {
     throw new Error(err_msg);
   }
 
-  shell.exec('touch ' + log_file)
+  shell.exec('touch ' + log_file);
 
   // var touch_logfile = shell.exec('touch ' + log_file);
   // if (touch_logfile.code !== 0) {
@@ -183,4 +201,20 @@ function mk_log(deploger, log_dir, log_file) {
 
     throw new Error(err_msg);
   }
+}
+
+function deploy_log_listener(deploger) {
+  var logger = deploger.logger;
+  var errHandler = deploger.errHandler;
+
+  deploger
+    .on('before-deploy', function(data) {
+      logger.trace('发布' + data.env + '环境中');
+    })
+    .on('mk-log-err', errHandler)
+    .on('before-build', function() {})
+    .on('after-build', function() {})
+    .on('build-err', errHandler)
+    .on('origin-sync-err', errHandler)
+  ;
 }

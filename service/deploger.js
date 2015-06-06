@@ -13,7 +13,7 @@ util.inherits(Deploger, EventEmitter);
 Deploger.prototype.errHandler = function(data) {
   this.logger.fatal(data.msg);
   this.logger.info(data.err.message);
-}
+};
 
 module.exports = Deploger;
 
