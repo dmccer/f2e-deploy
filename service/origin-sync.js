@@ -54,5 +54,5 @@ function sync_log_listener(deploger) {
     })
     .on('mk-dest-dir-err', errHandler)
     .on('copy-src-err', errHandler)
-
+  ;
 }
