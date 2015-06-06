@@ -95,6 +95,7 @@ function build(deploger, data, dest) {
   shell.cd(out_dir);
 
   var npm_prestart = shell.exec('npm run prestart');
+  shell.cd(config.root);
   if (npm_prestart.code !== 0) {
     err_msg = '编译失败: npm run prestart';
     err = new Error(err_msg);
@@ -103,8 +104,6 @@ function build(deploger, data, dest) {
       msg: err_msg,
       err: new Error(npm_prestart.output)
     });
-
-    shell.cd(config.root);
 
     throw err;
   }

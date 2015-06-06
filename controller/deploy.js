@@ -4,6 +4,7 @@ var config = require('../config');
 var build = require('../service/build');
 var origin_sync = require('../service/origin-sync');
 var qiniu_sync = require('../service/qiniu-sync');
+var generate_tar_gz = require('../service/tar-gz');
 var version = require('../service/version');
 var Deploger = require('../service/deploger');
 
@@ -105,30 +106,22 @@ module.exports = function (req, res) {
   }
   deploger.emit('after-sync-tasks');
 
-  logger.info('正在生成静态资源压缩包...');
-  // TODO
-  // 优化：工作区压缩，然后上传到静态服务器
+  try {
+    generate_tar_gz(deploger, build_rs, pkg);
+  } catch(e) {
+    err_msg = '步骤5失败: 生成静态项目压缩包';
+    err = new Error(err_msg);
 
-  // 进入静态服务器目录
-  shell.cd(path.dirname(dest_dir));
-
-  var tar_gz_tip_prefix = '生成静态资源压缩包' + path.resolve(dest_dir, pkg.version);
-  var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + pkg.version);
-  if (tar_gz.code !== 0) {
-    var err_tip = tar_gz_tip_prefix + '失败';
-
-    logger.fatal(err_tip);
-    logger.info('错误信息:\n' + tar_gz.output);
-
-    res.status(200).json({
-      code: 500,
-      data: err_tip
+    deploger.emit('generate-tar-gz-err', {
+      msg: err_msg,
+      err: err
     });
 
-    return;
+    return res.status(200).json({
+      code: 500,
+      data: err_msg
+    });
   }
-  logger.info(tar_gz.output);
-  logger.info(tar_gz_tip_prefix + '成功');
 
   logger.info('正在更新版本数据库...');
   version({
@@ -214,5 +207,6 @@ function deploy_log_listener(deploger) {
     .on('after-sync-tasks', function() {
       logger.info('静态资源发布到服务器成功');
     })
+    .on('generate-tar-gz-err', errHandler)
   ;
 }
