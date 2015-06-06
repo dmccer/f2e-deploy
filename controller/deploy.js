@@ -24,8 +24,8 @@ module.exports = function (req, res) {
     env: 'alpha'
   });
 
+  // 创建日志文件
   try {
-    // 创建日志文件
     mk_log(deploger, log_dir, log_file);
   } catch(e) {
     err_msg = '步骤1失败: 创建日志目录或文件';
@@ -68,10 +68,11 @@ module.exports = function (req, res) {
   // 项目 package.json
   var pkg = require(path.resolve(build_rs.out_dir, './package.json'));
 
+  // 同步到静态资源服务器
   try {
     origin_sync(deploger, pkg, build_rs);
   } catch(e) {
-    err_msg = '步骤3失败: 发布到静态资源服务器';
+    err_msg = '步骤3失败: 同步到静态资源服务器';
     err = new Error(err_msg);
 
     deploger.emit('origin-sync-err', {
@@ -85,31 +86,24 @@ module.exports = function (req, res) {
     });
   }
 
-  logger.info('正在发布静态资源到七牛服务器...');
-
+  // 同步项目到七牛服务器
   try {
-    var qiniu_sync_rs = qiniu_sync();
-
-    if (qiniu_sync_rs.code !== 0) {
-      logger.error('上传静态资源到七牛服务器出错...');
-      logger.error('错误信息:\n' + qiniu_sync_rs.output);
-
-      res.status(200).json({
-        code: 500,
-        data: '上传七牛服务器失败'
-      });
-
-      return;
-    }
-    logger.info(qiniu_sync_rs);
-    logger.info('上传七牛成功');
+    qiniu_sync();
   } catch(e) {
-    // 暂不做处理，因为七牛服务器不接受 html 文件，所以导致错误
-    logger.fatal('七牛传输 html 文件失败');
-    logger.info(e);
-  }
+    err_msg = '步骤4失败: 同步项目到七牛服务器';
+    err = new Error(err_msg);
 
-  logger.info('静态资源发布成功');
+    deploger.emit('qiniu-sync-err', {
+      msg: err_msg,
+      err: err
+    });
+
+    return res.status(200).json({
+      code: 500,
+      data: err_msg
+    });
+  }
+  deploger.emit('after-sync-tasks');
 
   logger.info('正在生成静态资源压缩包...');
   // TODO
@@ -216,5 +210,9 @@ function deploy_log_listener(deploger) {
     .on('after-build', function() {})
     .on('build-err', errHandler)
     .on('origin-sync-err', errHandler)
+    .on('qiniu-sync-err', errHandler)
+    .on('after-sync-tasks', function() {
+      logger.info('静态资源发布到服务器成功');
+    })
   ;
 }
