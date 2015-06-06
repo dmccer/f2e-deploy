@@ -130,18 +130,6 @@ describe('service/build.js', function() {
       deploger.removeListener('after-unzip-repos', listener);
     });
 
-    // it('should throw error when rm -rf zip failed', function() {
-    //   var listener = function(output, outfile) {
-    //     shell.exec('sudo chown -R root:admin ' + outfile);
-    //   };
-    //   deploger.on('after-npm-prestart', listener);
-
-    //   assert.throws(build.bind(null, deploger, data, dest), '删除' + outfile + '失败');
-
-    //   shell.exec('sudo chown -R kane:staff ' + outfile);
-    //   shell.exec('rm -rf ' + outfile);
-    // });
-
     it('should return correct outdir when build complete', function(done) {
       this.timeout(1200000);
 
