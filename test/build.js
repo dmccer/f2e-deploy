@@ -30,9 +30,6 @@ describe('service/build.js', function() {
   var log_file = data.repository.name + '.log';
   var log_file_relative = path.join(log_dir, log_file);
 
-  describe('module.exports', function() {
-  });
-
   describe('.validate()', function() {
     var deploger;
     var validate = builder.__get__('validate');
