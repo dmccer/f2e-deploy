@@ -3,13 +3,15 @@ var path = require('path');
 var config = require('../config');
 var request = require('request');
 
-module.exports = function (params, callback) {
-  var logger = require('../logger')(path.resolve(config.root, './log/' + params.owner + '/' + params.name + '.log'), 'version');
-  logger.info('即将写入的数据: ' + JSON.stringify(params));
+module.exports = function (deploger, params, callback) {
+  var url = url.resolve(config.vermgr.url, 'repos/' + params.name);
+  version_log_listener(deploger);
+
+  deploger.emit('before-update-version', params, url);
 
   var opt = {
     method: 'POST',
-    url: url.resolve(config.vermgr.url, 'repos/' + params.name),
+    url: url,
     form: {
       owner: params.owner,
       version: params.version,
@@ -21,21 +23,39 @@ module.exports = function (params, callback) {
     }
   };
 
-  logger.trace('请求地址: ' + opt.url);
-
   request(opt, function(err, res, body) {
     if (!err && res.statusCode == 200) {
-      var data = JSON.parse(body);
-
-      logger.info('写入版本到数据库成功');
-      logger.info(JSON.stringify(data));
+      deploger.emit('req-update-version-success', JSON.parse(body));
     } else {
-      logger.fatal('写入版本到数据库失败');
-      logger.info('status code: ' + res.statusCode);
-      logger.info('response body: ' + body);
-      logger.info('错误信息: ' + (err && err.message));
+      deploger.emit('req-update-version-err', err, res, body);
+
+      throw new Error('写入版本到数据库失败');
     }
 
     callback();
   });
 };
+
+
+function version_log_listener(deploger) {
+  var logger = deploger.logger;
+  var errHandler = deploger.errHandler;
+
+  deploger
+    .on('before-update-version', function(params, url) {
+      logger.trace('正在更新版本数据库...');
+      logger.info('vermgr 服务器: ' + url);
+      logger.info(JSON.stringify(params));
+    })
+    .on('update-version-success', function(body) {
+      logger.info('写入版本到数据库成功');
+      logger.info(JSON.stringify(body));
+    })
+    .on('req-update-version-err', function(err, res, body) {
+      logger.fatal('写入版本到数据库失败');
+      logger.info('status code: ' + res.statusCode);
+      logger.info('response body: ' + body);
+      logger.info('错误信息: ' + (err && err.message));
+    })
+  ;
+}

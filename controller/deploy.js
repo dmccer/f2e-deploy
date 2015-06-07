@@ -45,8 +45,10 @@ module.exports = function (req, res) {
 
   // build 项目
   deploger.emit('before-build');
+  var build_rs;
+
   try {
-    var build_rs = build(
+    build_rs = build(
       req.body,
       config.alpha_work_path
     );
@@ -123,27 +125,43 @@ module.exports = function (req, res) {
     });
   }
 
-  logger.info('正在更新版本数据库...');
-  version({
-    owner: build_rs.repository.owner.username,
-    name: build_rs.repository.name,
-    version: pkg.version,
-    url: build_rs.repository.url,
-    download: 'http://d.ifdiu.com/f2e/alpha/' + build_rs.repository.name + '?secret=yunhua@926&owner=' + build_rs.repository.owner.username
-  }, function() {
-    logger.info('版本更新成功');
-    // logger.info('正在清理发布目录...');
-    // shell.exec(['rm', '-rf', build_rs.out_dir].join(' '));
-    // logger.info('清理发布目录完成');
+  try {
+    version({
+      owner: build_rs.repository.owner.username,
+      name: build_rs.repository.name,
+      version: pkg.version,
+      url: build_rs.repository.url,
+      download: 'http://d.ifdiu.com/f2e/alpha/' + build_rs.repository.name + '?secret=yunhua@926&owner=' + build_rs.repository.owner.username
+    }, function() {
+      deploger.emit('after-update-version');
+      // TODO
+      // 新建函数处理下面任务
+      // logger.info('正在清理发布目录...');
+      // shell.exec(['rm', '-rf', build_rs.out_dir].join(' '));
+      // logger.info('清理发布目录完成');
 
-    // logger.warn('other info:');
-    // logger.info(log);
+      // logger.warn('other info:');
+      // logger.info(log);
 
-    res.status(200).json({
-      code: 200,
-      data: '项目发布成功'
+      res.status(200).json({
+        code: 200,
+        data: '项目发布成功'
+      });
     });
-  });
+  } catch(e) {
+    err_msg = '步骤6失败: 更新版本数据库失败';
+    err = new Error(err_msg);
+
+    deploger.emit('update-version-err', {
+      msg: err_msg,
+      err: err
+    });
+
+    return res.status(200).json({
+      code: 500,
+      data: err_msg
+    });
+  }
 };
 
 function mk_log(deploger, log_dir, log_file) {
@@ -163,6 +181,7 @@ function mk_log(deploger, log_dir, log_file) {
     throw new Error(err_msg);
   }
 
+  // 基本不会 throw  err
   shell.exec('touch ' + log_file);
 
   // var touch_logfile = shell.exec('touch ' + log_file);
@@ -208,5 +227,8 @@ function deploy_log_listener(deploger) {
       logger.info('静态资源发布到服务器成功');
     })
     .on('generate-tar-gz-err', errHandler)
+    .on('after-update-version', function() {
+      logger.info('版本更新成功');
+    })
   ;
 }
