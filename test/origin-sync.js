@@ -2,8 +2,6 @@ var chai = require('chai');
 var assert = chai.assert;
 
 var path = require('path');
-var url = require('url');
-var rewire = require('rewire');
 var shell = require('shelljs');
 
 var config = require('../config');
@@ -26,13 +24,16 @@ describe('service/origin-sync.js', function() {
     dest: 'dist'
   };
 
-  shell.exec('mkdir -p log/f2e');
-  shell.exec('touch log/f2e/demigod.log');
-  shell.exec('> log/f2e/demigod.log');
+  var logdir = 'log/f2e';
+  var logfile = path.join(logdir, 'demigod.log');
+
+  shell.exec('mkdir -p ' + logdir);
+  shell.exec('touch ' + logfile);
+  shell.exec('> ' + logfile);
 
   var deploger = new Deploger('log/f2e/demigod.log', 'origin_sync');
 
-  describe('module.exports', function() {
+  describe('module.exports()', function() {
     var remote_dir = path.resolve(config.static_server.alpha, built.repository.owner.username, pkg.name);
     var dest_dir = path.join(remote_dir, pkg.version);
 
@@ -60,6 +61,10 @@ describe('service/origin-sync.js', function() {
       deploger.on('after-mk-dest-dir', listener);
 
       assert.throws(origin_sync.bind(null, deploger, pkg, built), '拷贝待发布代码到静态服务器目录失败');
+    });
+
+    it('should return true when sync success', function() {
+      assert.isTrue(origin_sync(deploger, pkg, built));
     });
   });
 });
