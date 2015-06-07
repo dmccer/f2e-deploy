@@ -29,6 +29,23 @@ describe('service/qiniu-sync.js', function() {
       assert.throws(qiniu_sync.bind(null, deploger), '更新七牛配置文件' + config.qiniu + '失败');
       shell.exec('mv ' + config.qiniu + '.bak' + ' ' + config.qiniu);
     });
+
+    it('should throw err and msg when sync to qiniu server failed', function() {
+      var listener = function() {
+        shell.exec('mv ' + config.qiniu + ' ' + config.qiniu + '.bak');
+      };
+      deploger.on('after-update-conf', listener);
+
+      assert.throws(qiniu_sync.bind(null, deploger), '同步静态项目到七牛服务器失败');
+      shell.exec('mv ' + config.qiniu + '.bak' + ' ' + config.qiniu);
+    });
+
+    it('should return true when sync qiniu success', function(done) {
+      this.timeout(20000);
+
+      assert.isTrue(qiniu_sync(deploger));
+      done();
+    });
   });
 });
 

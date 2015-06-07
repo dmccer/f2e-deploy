@@ -2,7 +2,7 @@ dist/
 semantic/dist/
 deploy/
 log/
-qconf.json
+conf.json
 config.js
 
 # Numerous always-ignore extensions
