@@ -17,7 +17,7 @@ module.exports = function(deploger, pkg, built) {
 
     deploger.emit('mk-dest-dir-err', {
       msg: err_msg,
-      err: new Error(mk_dest_dir)
+      err: new Error(mk_dest_dir.output)
     });
 
     throw err;
@@ -40,7 +40,7 @@ module.exports = function(deploger, pkg, built) {
     throw err;
   }
 
-  return true
+  return true;
 };
 
 
