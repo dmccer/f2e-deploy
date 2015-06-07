@@ -33,9 +33,15 @@ describe('service/origin-sync.js', function() {
   var deploger = new Deploger('log/f2e/demigod.log', 'origin_sync');
 
   describe('module.exports', function() {
-    it('should throw error and msg when mkdir failed', function() {
-      var remote_dir = path.resolve(config.static_server.alpha, built.repository.owner.username, pkg.name);
-      var dest_dir = path.join(remote_dir, pkg.version);
+    var remote_dir = path.resolve(config.static_server.alpha, built.repository.owner.username, pkg.name);
+    var dest_dir = path.join(remote_dir, pkg.version);
+
+    afterEach(function() {
+      deploger.removeAllListeners();
+    });
+
+    it('should throw error and msg when mkdir failed', function(done) {
+      this.timeout(5000);
 
       shell.exec('sudo mkdir -p ' + remote_dir);
       shell.exec('sudo touch ' + dest_dir);
@@ -43,6 +49,17 @@ describe('service/origin-sync.js', function() {
       assert.throws(origin_sync.bind(null, deploger, pkg, built), '创建静态服务器目录' + dest_dir + '失败');
 
       shell.exec('sudo rm -rf ' + remote_dir);
+
+      done();
+    });
+
+    it('should throw err and msg when copy file failed', function() {
+      var listener = function() {
+        shell.exec('sudo rm -rf ' + dest_dir);
+      };
+      deploger.on('after-mk-dest-dir', listener);
+
+      assert.throws(origin_sync.bind(null, deploger, pkg, built), '拷贝待发布代码到静态服务器目录失败');
     });
   });
 });

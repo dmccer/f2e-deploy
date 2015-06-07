@@ -23,6 +23,8 @@ module.exports = function(deploger, pkg, built) {
     throw err;
   }
 
+  deploger.emit('after-mk-dest-dir');
+
   var sync_src = shell.exec([
     'sudo cp -rf',
     src,
