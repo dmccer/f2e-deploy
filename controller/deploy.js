@@ -14,9 +14,8 @@ module.exports = function (req, res) {
   var log_dir = path.join('log/', repos.owner.username);
   var log_file = repos.name + '.log';
 
-  var deploger = new Deploger(log_dir, log_file);
   var err_msg, err;
-
+  var deploger = new Deploger(log_dir, log_file);
   deploy_log_listener(deploger);
 
   deploger.emit('before-deploy', {
@@ -125,43 +124,42 @@ module.exports = function (req, res) {
     });
   }
 
-  try {
-    version({
-      owner: build_rs.repository.owner.username,
-      name: build_rs.repository.name,
-      version: pkg.version,
-      url: build_rs.repository.url,
-      download: 'http://d.ifdiu.com/f2e/alpha/' + build_rs.repository.name + '?secret=yunhua@926&owner=' + build_rs.repository.owner.username
-    }, function() {
-      deploger.emit('after-update-version');
-      // TODO
-      // 新建函数处理下面任务
-      // logger.info('正在清理发布目录...');
-      // shell.exec(['rm', '-rf', build_rs.out_dir].join(' '));
-      // logger.info('清理发布目录完成');
+  version({
+    owner: build_rs.repository.owner.username,
+    name: build_rs.repository.name,
+    version: pkg.version,
+    url: build_rs.repository.url,
+    download: 'http://d.ifdiu.com/f2e/alpha/' + build_rs.repository.name + '?secret=yunhua@926&owner=' + build_rs.repository.owner.username
+  }, function(err) {
+    deploger.emit('after-update-version');
 
-      // logger.warn('other info:');
-      // logger.info(log);
+    if (err) {
+      err_msg = '步骤6失败: 更新版本数据库失败';
+      err = new Error(err_msg);
 
-      res.status(200).json({
-        code: 200,
-        data: '项目发布成功'
+      deploger.emit('update-version-err', {
+        msg: err_msg,
+        err: err
       });
-    });
-  } catch(e) {
-    err_msg = '步骤6失败: 更新版本数据库失败';
-    err = new Error(err_msg);
 
-    deploger.emit('update-version-err', {
-      msg: err_msg,
-      err: err
-    });
+      return res.status(200).json({
+        code: 500,
+        data: err_msg
+      });
+    }
 
-    return res.status(200).json({
-      code: 500,
-      data: err_msg
+    // TODO
+    // 新建函数处理下面任务
+    // 不需要清理，缓存加速再次发布
+    // logger.info('正在清理发布目录...');
+    // shell.exec(['rm', '-rf', build_rs.out_dir].join(' '));
+    // logger.info('清理发布目录完成');
+
+    res.status(200).json({
+      code: 200,
+      data: '项目发布成功'
     });
-  }
+  });
 };
 
 function mk_log(deploger, log_dir, log_file) {
