@@ -34,6 +34,7 @@
     "coveralls": "^2.11.2",
     "mocha": "^2.2.5",
     "rewire": "^2.3.3",
+    "sinon": "^1.14.1",
     "supertest": "^1.0.1"
   }
 }
