@@ -5,6 +5,8 @@ var config = require('../config');
 module.exports = function(deploger, built, pkg) {
   // 静态资源服务器的目录(含资源版本)
   var dest_dir = path.resolve(config.static_server.alpha, built.repository.owner.username, pkg.name, pkg.version);
+  var subffix = '.tar.gz';
+  var tar_gz_file = dest_dir + subffix;
   var err_msg, err;
 
   targz_log_listener(deploger);
@@ -15,8 +17,9 @@ module.exports = function(deploger, built, pkg) {
   // 进入静态服务器目录
   shell.cd(path.dirname(dest_dir));
 
-  var tar_gz_tip_prefix = '生成静态资源压缩包' + path.resolve(dest_dir, pkg.version);
-  var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + '.tar.gz ' + pkg.version);
+  var tar_gz_tip_prefix = '生成静态资源压缩包' + tar_gz_file;
+  var tar_gz = shell.exec('sudo tar -czvf ' + pkg.version + subffix + ' ' + pkg.version);
+  shell.cd(config.root);
   if (tar_gz.code !== 0) {
     err_msg = tar_gz_tip_prefix + '失败';
     err = new Error(err_msg);
@@ -30,6 +33,8 @@ module.exports = function(deploger, built, pkg) {
   }
 
   deploger.emit('after-tar-gz', tar_gz_tip_prefix + '成功');
+
+  return true;
 };
 
 function targz_log_listener(deploger) {
