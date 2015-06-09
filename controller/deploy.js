@@ -9,16 +9,16 @@ var version = require('../service/version');
 var Deploger = require('../service/deploger');
 
 module.exports = function (req, res) {
+  var _deploger = new Deploger('log/deploy.log', 'deploy');
+  _deploy_log_listener(_deploger);
+
   var repos = req.body.repository;
 
   var log_dir = path.join('log/', repos.owner.username);
   var log_file = repos.name + '.log';
-
   var err_msg, err;
-  var deploger = new Deploger(log_dir, log_file);
-  deploy_log_listener(deploger);
 
-  deploger.emit('before-deploy', {
+  _deploger.emit('before-deploy', {
     log_dir: log_dir,
     log_file: log_file,
     env: 'alpha'
@@ -26,7 +26,7 @@ module.exports = function (req, res) {
 
   // 创建日志文件
   try {
-    mk_log(deploger, log_dir, log_file);
+    mk_log(_deploger, log_dir, log_file);
   } catch(e) {
     err_msg = '步骤1失败: 创建日志目录或文件';
     err = new Error(err_msg);
@@ -41,6 +41,8 @@ module.exports = function (req, res) {
       data: err_msg
     });
   }
+
+  var deploger = new Deploger(path.join(log_dir, log_file), 'publish');
 
   // build 项目
   deploger.emit('before-build');
@@ -207,7 +209,7 @@ function mk_log(deploger, log_dir, log_file) {
   }
 }
 
-function deploy_log_listener(deploger) {
+function _deploy_log_listener(deploger) {
   var logger = deploger.logger;
   var errHandler = deploger.errHandler;
 
@@ -216,6 +218,11 @@ function deploy_log_listener(deploger) {
       logger.trace('发布' + data.env + '环境中');
     })
     .on('mk-log-err', errHandler)
+  ;
+}
+
+function deploy_log_listener(deploger) {
+  deploger
     .on('before-build', function() {})
     .on('after-build', function() {})
     .on('build-err', errHandler)
