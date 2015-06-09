@@ -4,10 +4,11 @@ var config = require('../config');
 var request = require('request');
 
 module.exports = function (deploger, params, callback) {
-  version_log_listener(deploger);
-  deploger.emit('before-update-version', params, url);
-
   var _url = url.resolve(config.vermgr.url, 'repos/' + params.name);
+
+  version_log_listener(deploger);
+  deploger.emit('before-update-version', params, _url);
+
   var opt = {
     method: 'POST',
     url: _url,
