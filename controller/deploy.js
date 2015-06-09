@@ -93,7 +93,7 @@ module.exports = function (req, res) {
 
   // 同步项目到七牛服务器
   try {
-    qiniu_sync();
+    qiniu_sync(deploger);
   } catch(e) {
     err_msg = '步骤4失败: 同步项目到七牛服务器';
     err = new Error(err_msg);
