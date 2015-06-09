@@ -43,6 +43,7 @@ module.exports = function (req, res) {
   }
 
   var deploger = new Deploger(path.join(log_dir, log_file), 'publish');
+  deploger_log_listener(deploger);
 
   // build 项目
   deploger.emit('before-build');
