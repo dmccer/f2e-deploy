@@ -100,7 +100,7 @@ module.exports = function (req, res) {
 
     deploger.emit('qiniu-sync-err', {
       msg: err_msg,
-      err: err
+      err: e
     });
 
     return res.status(200).json({
