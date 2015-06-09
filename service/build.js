@@ -9,7 +9,7 @@ module.exports = function(data, dest) {
 
   var repos_name = data.repository.name;
   var owner_name = data.repository.owner.username;
-  var deploger = new Deploger(path.join('log', owner_name, repos_name), 'build');
+  var deploger = new Deploger(path.join('log', owner_name, repos_name + '.log'), 'build');
 
   build_log_listener(deploger);
 
