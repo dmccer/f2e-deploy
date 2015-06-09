@@ -223,6 +223,9 @@ function _deploy_log_listener(deploger) {
 }
 
 function deploy_log_listener(deploger) {
+  var logger = deploger.logger;
+  var errHandler = deploger.errHandler;
+
   deploger
     .on('before-build', function() {})
     .on('after-build', function() {})
