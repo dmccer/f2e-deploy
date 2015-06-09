@@ -127,7 +127,7 @@ module.exports = function (req, res) {
     });
   }
 
-  version({
+  version(deploger, {
     owner: build_rs.repository.owner.username,
     name: build_rs.repository.name,
     version: pkg.version,
