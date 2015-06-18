@@ -11,6 +11,7 @@ module.exports = function(req, res) {
   var owner = _.trim(req.query.owner);
   var name = _.trim(req.params.name);
 
+  var resource = 'Static tar gz';
   var err_msg, err;
 
   if (!owner || !name) {
@@ -22,8 +23,13 @@ module.exports = function(req, res) {
       err: err
     });
 
-    return res.status(200).json({
-      data: err_msg
+    return res.status(422).json({
+      msg: err_msg,
+      errs: [{
+        resource: resource,
+        field: 'owner, name',
+        code: 'invalid_field'
+      }]
     });
   }
 
@@ -39,8 +45,8 @@ module.exports = function(req, res) {
       err: err
     });
 
-    return res.status(200).json({
-      data: err_msg
+    return res.status(404).json({
+      msg: err_msg
     });
   }
 
@@ -57,8 +63,8 @@ module.exports = function(req, res) {
       err: err
     });
 
-    return res.status(200).json({
-      data: err_msg
+    return res.status(404).json({
+      msg: err_msg
     });
   }
 
