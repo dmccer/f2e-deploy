@@ -7,6 +7,7 @@ var qiniu_sync = require('../service/qiniu-sync');
 var generate_tar_gz = require('../service/tar-gz');
 var version = require('../service/version');
 var Deploger = require('../service/deploger');
+var reser = require('../util/reser');
 
 module.exports = function (req, res) {
   var _deploger = new Deploger('log/deploy.log', 'deploy');
@@ -36,7 +37,7 @@ module.exports = function (req, res) {
       err: err
     });
 
-    return res.status(200).json({
+    return res.status(500).json({
       code: 500,
       data: err_msg
     });

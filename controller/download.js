@@ -2,6 +2,7 @@ var path = require('path');
 var shell = require('shelljs');
 var _ = require('lodash');
 var config = require('../config');
+var reser = require('../util/reser');
 var Deploger = require('../service/deploger');
 
 module.exports = function(req, res) {
@@ -23,14 +24,10 @@ module.exports = function(req, res) {
       err: err
     });
 
-    return res.status(422).json({
-      msg: err_msg,
-      errs: [{
-        resource: resource,
-        field: 'owner, name',
-        code: 'invalid_field'
-      }]
-    });
+    return res.status(422).json(reser.res(
+      err_msg,
+      reser.err(resource, 'owner, name', reser.ERR_TYPE.MISSING_FIELD)
+    ));
   }
 
   var repos_work_dir = path.resolve(config.alpha_work_path, owner, name);
@@ -45,9 +42,7 @@ module.exports = function(req, res) {
       err: err
     });
 
-    return res.status(404).json({
-      msg: err_msg
-    });
+    return res.status(404).json(reser.res(err_msg));
   }
 
   var pkg = require(path.resolve(repos_work_dir, './package.json'));
@@ -63,9 +58,7 @@ module.exports = function(req, res) {
       err: err
     });
 
-    return res.status(404).json({
-      msg: err_msg
-    });
+    return res.status(404).json(reser.res(err_msg));
   }
 
   return res.download(fileurl, name + '-' + pkg.version + '.tar.gz', function(err) {
