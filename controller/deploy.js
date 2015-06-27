@@ -72,7 +72,9 @@ module.exports = function (req, res) {
   deploger.emit('after-build');
 
   // 项目 package.json
-  var pkg = require(path.resolve(build_rs.out_dir, './package.json'));
+  var pkg_json_file = path.resolve(build_rs.out_dir, './package.json');
+  require.cache[pkg_json_file] = null;
+  var pkg = require(pkg_json_file);
 
   // 同步到静态资源服务器
   try {
