@@ -48,7 +48,7 @@ function version_log_listener(deploger) {
       logger.info('vermgr 服务器: ' + url);
       logger.info(JSON.stringify(params));
     })
-    .on('update-version-success', function(body) {
+    .on('req-update-version-success', function(body) {
       logger.info('写入版本到数据库成功');
       logger.info(JSON.stringify(body));
     })

@@ -52,6 +52,7 @@ module.exports = function (req, res) {
 
   try {
     build_rs = build(
+      deploger,
       req.body,
       config.alpha_work_path
     );

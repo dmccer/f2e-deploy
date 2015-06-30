@@ -4,12 +4,12 @@ var _ = require('lodash');
 var config = require('../config');
 var Deploger = require('./deploger');
 
-module.exports = function(data, dest) {
+module.exports = function(deploger, data, dest) {
   validate(new Deploger('log/deploy.log', 'deploy'), data, dest);
 
   var repos_name = data.repository.name;
   var owner_name = data.repository.owner.username;
-  var deploger = new Deploger(path.join('log', owner_name, repos_name + '.log'), 'build');
+  // var deploger = new Deploger(path.join('log', owner_name, repos_name + '.log'), 'build');
 
   build_log_listener(deploger);
 
