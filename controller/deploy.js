@@ -7,7 +7,8 @@ var qiniu_sync = require('../service/qiniu-sync');
 var generate_tar_gz = require('../service/tar-gz');
 var version = require('../service/version');
 var Deploger = require('../service/deploger');
-var reser = require('../util/reser');
+var status_api = require('./status');
+//var reser = require('../util/reser');
 
 module.exports = function (req, res) {
   var _deploger = new Deploger('log/deploy.log', 'deploy');
@@ -32,7 +33,7 @@ module.exports = function (req, res) {
     err_msg = '步骤1失败: 创建日志目录或文件';
     err = new Error(err_msg);
 
-    deploger.emit('mk-log-err', {
+    _deploger.emit('mk-log-err', {
       msg: err_msg,
       err: err
     });
@@ -95,6 +96,14 @@ module.exports = function (req, res) {
     });
   }
 
+  status_api.update({
+    name: repos.name,
+    owner: repos.owner.username,
+    status: 4
+  }, function () {
+
+  });
+
   // 同步项目到七牛服务器
   try {
     qiniu_sync(deploger);
@@ -112,6 +121,15 @@ module.exports = function (req, res) {
       data: err_msg
     });
   }
+
+  status_api.update({
+    name: repos.name,
+    owner: repos.owner.username,
+    status: 5
+  }, function () {
+
+  });
+
   deploger.emit('after-sync-tasks');
 
   try {
@@ -131,11 +149,19 @@ module.exports = function (req, res) {
     });
   }
 
+  status_api.update({
+    name: repos.name,
+    owner: repos.owner.username,
+    status: 6
+  }, function () {
+
+  });
+
   version(deploger, {
     owner: build_rs.repository.owner.username,
     name: build_rs.repository.name,
     version: pkg.version,
-    url: build_rs.repository.url,
+    status: 7,
     download: 'http://d.ifdiu.com/f2e/alpha/' + build_rs.repository.name + '?secret=yunhua@926&owner=' + build_rs.repository.owner.username
   }, function(err) {
     deploger.emit('after-update-version');
