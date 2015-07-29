@@ -3,16 +3,12 @@ var path = require('path');
 var _ = require('lodash');
 var config = require('../config');
 var Deploger = require('./deploger');
+var status_api = require('./status');
 
 module.exports = function(deploger, data, dest) {
   validate(new Deploger('log/deploy.log', 'deploy'), data, dest);
 
-  var repos_name = data.repository.name;
-  var owner_name = data.repository.owner.username;
-  // var deploger = new Deploger(path.join('log', owner_name, repos_name + '.log'), 'build');
-
   build_log_listener(deploger);
-
   var out_dir = build(deploger, data, dest);
 
   return {
@@ -35,97 +31,157 @@ function build(deploger, data, dest) {
     owner_name: owner_name
   });
 
-  var tar_gz_url = [
-    repos_url,
-    'archive',
-    commit_id + postfix
-  ].join('/');
-
   var out_dir = path.resolve(dest, owner_name, repos_name);
   var out_file = out_dir + postfix;
-
   var err, err_msg;
 
-  var mk_out_dir = shell.exec('mkdir -p ' + out_dir);
-  if (mk_out_dir.code !== 0) {
-    err_msg = '创建预处理目录' + out_dir + '失败';
-    err = new Error(err_msg);
+  var status_add = new Promise(function(resolve, reject) {
+    status_api.add({
+      name: repos_name,
+      owner: owner_name,
+      url: repos_url,
+      status: 1
+    }, function(err) {
+      if (err) {
+        deploger.emit('status-add', {
+          msg: err.message,
+          err: err
+        });
 
-    deploger.emit('mk-out-dir-err', {
-      msg: err_msg,
-      err: err
+        return reject(err);
+      }
+
+      return resolve();
     });
+  });
 
-    throw err;
-  }
-  deploger.emit('after-mk-out-dir', out_dir);
+  status_add
+    .then(function() {
+      var mk_out_dir = shell.exec('mkdir -p ' + out_dir);
+      if (mk_out_dir.code !== 0) {
+        err_msg = '创建预处理目录' + out_dir + '失败';
+        err = new Error(err_msg);
 
-  var curl_repos = shell.exec([
-    'curl -o',
-    out_file,
-    tar_gz_url
-  ].join(' '));
-  if (curl_repos.code !== 0) {
-    err_msg = '下载' + tar_gz_url + '失败';
-    err = new Error(err_msg);
+        deploger.emit('mk-out-dir-err', {
+          msg: err_msg,
+          err: err
+        });
 
-    deploger.emit('curl-repos-err', {
-      msg: '下载' + tar_gz_url + '失败',
-      err: new Error(curl_repos.output)
+        throw err;
+      }
+      deploger.emit('after-mk-out-dir', out_dir);
+
+      var tar_gz_url = [
+        repos_url,
+        'archive',
+        commit_id + postfix
+      ].join('/');
+
+      var curl_repos = shell.exec([
+        'curl -o',
+        out_file,
+        tar_gz_url
+      ].join(' '));
+      if (curl_repos.code !== 0) {
+        err_msg = '下载' + tar_gz_url + '失败';
+        err = new Error(err_msg);
+
+        deploger.emit('curl-repos-err', {
+          msg: '下载' + tar_gz_url + '失败',
+          err: new Error(curl_repos.output)
+        });
+
+        throw err;
+      }
+      deploger.emit('after-curl-repos', curl_repos.output, tar_gz_url, out_file);
+
+      return new Promise(function(resolve, reject) {
+        status_api.update({
+          name: repos_name,
+          owner: owner_name,
+          status: 2
+        }, function(err) {
+          if (err) {
+            deploger.emit('status-compile', {
+              msg: err.message,
+              err: err
+            });
+
+            return reject(err);
+          }
+
+          return resolve();
+        });
+      });
+    })
+    .then(function() {
+      var unzip_repos = shell.exec(['tar zxvf', out_file, '-C', out_dir].join(' '));
+      if (unzip_repos.code !== 0) {
+        err_msg = '解压' + out_file + '失败';
+        err = new Error(err_msg);
+        deploger.emit('unzip-repos-err', {
+          msg: err_msg,
+          err: new Error(unzip_repos.output)
+        });
+
+        throw err;
+      }
+      deploger.emit('after-unzip-repos', unzip_repos.output, out_dir, out_file);
+
+      // 进入目录 out_dir
+      shell.cd(out_dir);
+
+      var npm_prestart = shell.exec('npm run prestart');
+      shell.cd(config.root);
+      if (npm_prestart.code !== 0) {
+        err_msg = '编译失败: npm run prestart';
+        err = new Error(err_msg);
+
+        deploger.emit('npm-prestart-err', {
+          msg: err_msg,
+          err: new Error(npm_prestart.output)
+        });
+
+        throw err;
+      }
+      deploger.emit('after-npm-prestart', npm_prestart.output, out_file);
+
+      var rm_zip = shell.exec(['rm', '-rf', out_file].join(' '));
+      if (rm_zip.code !== 0) {
+        err_msg = '删除' + out_file + '失败';
+        err = new Error(err_msg);
+        deploger.emit('rm-zip-err', {
+          msg: err_msg,
+          err: new Error(rm_zip.output)
+        });
+
+        throw err;
+      }
+      deploger.emit('after-rm-zip', out_file);
+
+      status_api.update({
+        name: repos_name,
+        owner: owner_name,
+        status: 3
+      }, function(err) {
+        if (err) {
+          deploger.emit('status-static-server', {
+            msg: err.message,
+            err: err
+          });
+
+          throw err;
+        }
+      });
+    })
+    .catch(function(err) {
+      throw err;
     });
-
-    throw err;
-  }
-  deploger.emit('after-curl-repos', curl_repos.output, tar_gz_url, out_file);
-
-  var unzip_repos = shell.exec(['tar zxvf', out_file, '-C', out_dir].join(' '));
-  if (unzip_repos.code !== 0) {
-    err_msg = '解压' + out_file + '失败';
-    err = new Error(err_msg);
-    deploger.emit('unzip-repos-err', {
-      msg: err_msg,
-      err: new Error(unzip_repos.output)
-    });
-
-    throw err;
-  }
-  deploger.emit('after-unzip-repos', unzip_repos.output, out_dir, out_file);
-
-  // 进入目录 out_dir
-  shell.cd(out_dir);
-
-  var npm_prestart = shell.exec('npm run prestart');
-  shell.cd(config.root);
-  if (npm_prestart.code !== 0) {
-    err_msg = '编译失败: npm run prestart';
-    err = new Error(err_msg);
-
-    deploger.emit('npm-prestart-err', {
-      msg: err_msg,
-      err: new Error(npm_prestart.output)
-    });
-
-    throw err;
-  }
-  deploger.emit('after-npm-prestart', npm_prestart.output, out_file);
-
-  var rm_zip = shell.exec(['rm', '-rf', out_file].join(' '));
-  if (rm_zip.code !== 0) {
-    err_msg = '删除' + out_file + '失败';
-    err = new Error(err_msg);
-    deploger.emit('rm-zip-err', {
-      msg: err_msg,
-      err: new Error(rm_zip.output)
-    });
-
-    throw err;
-  }
-  deploger.emit('after-rm-zip', out_file);
 
   return out_dir;
 }
 
-function validate(deploger, data, dest) {
+function validate(deploger, data) {
   var err, err_msg;
 
   if (!data) {
