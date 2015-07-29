@@ -9,12 +9,14 @@ module.exports = function(deploger, data, dest) {
   validate(new Deploger('log/deploy.log', 'deploy'), data, dest);
 
   build_log_listener(deploger);
-  var out_dir = build(deploger, data, dest);
 
-  return {
-    out_dir: out_dir,
-    repository: data.repository
-  };
+  return build(deploger, data, dest)
+    .then(function(out_dir) {
+      return {
+        out_dir: out_dir,
+        repository: data.repository
+      };
+    });
 };
 
 function build(deploger, data, dest) {
@@ -36,7 +38,7 @@ function build(deploger, data, dest) {
   var err, err_msg;
 
   var status_add = new Promise(function(resolve, reject) {
-    status_api.add({
+    status_api.update({
       name: repos_name,
       owner: owner_name,
       url: repos_url,
@@ -55,7 +57,7 @@ function build(deploger, data, dest) {
     });
   });
 
-  status_add
+  return status_add
     .then(function() {
       var mk_out_dir = shell.exec('mkdir -p ' + out_dir);
       if (mk_out_dir.code !== 0) {
@@ -159,26 +161,28 @@ function build(deploger, data, dest) {
       }
       deploger.emit('after-rm-zip', out_file);
 
-      status_api.update({
-        name: repos_name,
-        owner: owner_name,
-        status: 3
-      }, function(err) {
-        if (err) {
-          deploger.emit('status-static-server', {
-            msg: err.message,
-            err: err
-          });
+      return new Promise(function(resolve, reject) {
+        status_api.update({
+          name: repos_name,
+          owner: owner_name,
+          status: 3
+        }, function(err) {
+          if (err) {
+            deploger.emit('status-static-server', {
+              msg: err.message,
+              err: err
+            });
 
-          throw err;
-        }
+            return reject(err);
+          }
+
+          return resolve();
+        });
       });
     })
-    .catch(function(err) {
-      throw err;
+    .then(function () {
+      return out_dir;
     });
-
-  return out_dir;
 }
 
 function validate(deploger, data) {

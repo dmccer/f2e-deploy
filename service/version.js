@@ -3,7 +3,7 @@ var path = require('path');
 var config = require('../config');
 var request = require('request');
 
-module.exports = function (deploger, params, callback) {
+module.exports = function (deploger, params) {
   var _url = url.resolve(config.vermgr.url, 'repos/' + params.name);
 
   version_log_listener(deploger);
@@ -16,6 +16,7 @@ module.exports = function (deploger, params, callback) {
       owner: params.owner,
       version: params.version,
       url: params.url,
+      status: params.status,
       download: params.download
     },
     headers: {
@@ -23,17 +24,23 @@ module.exports = function (deploger, params, callback) {
     }
   };
 
-  request(opt, function(err, res, body) {
-    var error;
+  return new Promise(function (resolve, reject) {
+    request(opt, function(err, res, body) {
+      var error;
 
-    if (!err && res.statusCode == 200) {
-      deploger.emit('req-update-version-success', JSON.parse(body));
-    } else {
-      deploger.emit('req-update-version-err', err, res, body);
-      error = new Error('写入版本到数据库失败');
-    }
+      if (!err && res.statusCode == 200) {
+        deploger.emit('req-update-version-success', JSON.parse(body));
+      } else {
+        deploger.emit('req-update-version-err', err, res, body);
+        error = new Error('写入版本到数据库失败');
+      }
 
-    callback(error);
+      if (error) {
+        return reject(error);
+      }
+
+      resolve();
+    });
   });
 };
 

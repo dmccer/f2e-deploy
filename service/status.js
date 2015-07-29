@@ -6,36 +6,6 @@ var config = require('../config');
 var request = require('request');
 
 var Status = {
-  add: function(params, callback) {
-    var _url = url.resolve(config.vermgr.url, 'repos');
-
-    var opt = {
-      method: 'POST',
-      url: _url,
-      form: {
-        name: param.name,
-        owner: params.owner,
-        url: params.url,
-        status: 1
-      },
-      headers: {
-        Authorization: config.vermgr.authorization
-      }
-    };
-
-    request(opt, function(err, res, body) {
-      var error;
-
-      if (!err && res.statusCode == 200) {
-        console.log(JSON.parse(body));
-      } else {
-        error = new Error('添加项目到数据库失败');
-      }
-
-      callback(error);
-    });
-  },
-
   update: function(params, callback) {
     var _url = url.resolve(config.vermgr.url, 'repos/' + params.name);
 
@@ -43,7 +13,7 @@ var Status = {
       method: 'POST',
       url: _url,
       form: {
-        name: param.name,
+        name: params.name,
         owner: params.owner,
         status: params.status
       },
@@ -54,11 +24,12 @@ var Status = {
 
     request(opt, function(err, res, body) {
       var error;
+      var body = JSON.parse(body);
 
       if (!err && res.statusCode == 200) {
-        console.log(JSON.parse(body));
+        console.log(body);
       } else {
-        error = new Error('更新发布状态到数据库失败');
+        error = new Error(body.msg);
       }
 
       callback(error);
