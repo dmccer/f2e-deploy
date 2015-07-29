@@ -40,7 +40,6 @@ module.exports = function (deploger, params, callback) {
 
 function version_log_listener(deploger) {
   var logger = deploger.logger;
-  var errHandler = deploger.errHandler;
 
   deploger
     .on('before-update-version', function(params, url) {
