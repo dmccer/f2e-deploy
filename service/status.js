@@ -6,6 +6,27 @@ var config = require('../config');
 var request = require('request');
 
 var Status = {
+  get: function(params, callback) {
+    var _url = url.resolve(config.vermgr.url, 'repos/' + params.name + '?owner=' + params.owner);
+    var opt = {
+      method: 'GET',
+      url: _url,
+      headers: {
+        Authorization: config.vermgr.authorization
+      }
+    };
+
+    request(opt, function(err, res, body) {
+      var body = JSON.parse(body);
+
+      if (!err && res.statusCode == 200) {
+        callback(null, body);
+      } else {
+        callback(new Error(body.msg));
+      }
+    });
+  },
+
   update: function(params, callback) {
     var _url = url.resolve(config.vermgr.url, 'repos/' + params.name);
 
