@@ -7,7 +7,7 @@ var qiniu_sync = require('../service/qiniu-sync');
 var generate_tar_gz = require('../service/tar-gz');
 var version = require('../service/version');
 var Deploger = require('../service/deploger');
-var status_api = require('../service/status');
+var status_api = require('../service/vermgr');
 //var reser = require('../util/reser');
 
 module.exports = function (req, res) {
