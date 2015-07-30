@@ -1,10 +1,11 @@
 var express = require('express');
+var path = require('path');
 var favicon = require('serve-favicon');
 var bodyParser = require('body-parser');
 var log4js = require('log4js');
 var logger = require('./logger')('log/deploy.log', 'deploy');
 var api = require('./api');
-var auth_service = require('./service/authorization');
+var web = require('./web');
 
 var app = express();
 
@@ -12,21 +13,11 @@ app.use(favicon(__dirname + '/favicon.png'));
 app.use(log4js.connectLogger(logger, { level: 'auto' }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(function(req, res, next) {
-  var method = req.method.toLowerCase();
-
-  if (method === 'get' &&
-      !auth_service.check(req.query.secret) ||
-      method === 'post' && !auth_service.check(req.body.secret)) {
-    logger.warn('403 请求, ip: ' + req.ip);
-    res.status(403).send('无权限');
-    return;
-  }
-
-  next();
-});
-
+app.use('/', web);
 app.use('/f2e', api);
 
 var server = app.listen(9999, function () {
