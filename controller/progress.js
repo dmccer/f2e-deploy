@@ -1,13 +1,13 @@
 var path = require('path');
 var _ = require('lodash');
 var config = require('../config');
-var Status = require('../service/status');
+var vermgr = require('../service/vermgr');
 
 module.exports = function(req, res) {
-  var owner = _.trim(req.query.owner);
+  var owner = _.trim(req.params.owner);
   var name = _.trim(req.params.name);
 
-  Status.get({
+  vermgr.get({
     name: name,
     owner: owner
   }, function(err, body) {
