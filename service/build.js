@@ -3,7 +3,7 @@ var path = require('path');
 var _ = require('lodash');
 var config = require('../config');
 var Deploger = require('./deploger');
-var status_api = require('./status');
+var status_api = require('./vermgr');
 
 module.exports = function(deploger, data, dest) {
   validate(new Deploger('log/deploy.log', 'deploy'), data, dest);

@@ -5,12 +5,15 @@ var url = require('url');
 var config = require('../config');
 var request = require('request');
 
-var Status = {
+var vermgr = {
   get: function(params, callback) {
-    var _url = url.resolve(config.vermgr.url, 'repos/' + params.name + '?owner=' + params.owner);
+    var _url = url.resolve(config.vermgr.url, 'repos/' + params.name);
     var opt = {
       method: 'GET',
       url: _url,
+      qs: {
+        owner: params.owner
+      },
       headers: {
         Authorization: config.vermgr.authorization
       }
@@ -21,6 +24,28 @@ var Status = {
 
       if (!err && res.statusCode == 200) {
         callback(null, body);
+      } else {
+        callback(new Error(body.msg));
+      }
+    });
+  },
+
+  list: function(params, callback) {
+    var _url = url.resolve(config.vermgr.url, 'repos');
+    var opt = {
+      method: 'GET',
+      url: _url,
+      qs: params,
+      headers: {
+        Authorization: config.vermgr.authorization
+      }
+    };
+
+    request(opt, function(err, res, body) {
+      var body = JSON.parse(body);
+
+      if (!err && res.statusCode == 200) {
+        callback(null, body.data);
       } else {
         callback(new Error(body.msg));
       }
@@ -58,4 +83,4 @@ var Status = {
   }
 };
 
-module.exports = Status;
+module.exports = vermgr;
