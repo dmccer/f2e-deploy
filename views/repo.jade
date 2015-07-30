@@ -1,0 +1,23 @@
+//
+   Created by Kane on 15/7/30.
+
+extends ./layout
+
+block title
+    title #{repo.name} - 静态资源发布管理
+
+block content
+    h2 #{repo.name} #{repo.version}
+    p 项目拥有者: #{repo.owner}
+    p
+        a(href=repo.url) #{repo.url}
+    p 发布状态: #{repo.status_text}
+
+    div
+        button.publish(eid="publish-btn", repo="#{repo.owner}/#{repo.name}") 发布项目
+
+    div 发布进度
+        span.progress(eid="progress")
+
+    script(src='http://cdn.staticfile.org/zepto/1.1.4/zepto.min.js')
+    script(src='/js/progress.js')

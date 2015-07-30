@@ -1,0 +1,20 @@
+//
+   Created by Kane on 15/7/30.
+
+extends ./layout
+
+block title
+    title 静态资源发布管理
+
+block content
+    ul
+        each item in repos
+            li
+                h3
+                    a(href="/repos/#{item.owner}/#{item.name}") #{item.owner} / #{item.name}
+                p
+                    a(href=item.url) #{item.url}
+                .status #{item.status_text}
+
+
+
