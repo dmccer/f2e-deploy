@@ -132,6 +132,12 @@ module.exports = function (req, res) {
       });
     })
     .catch(function (err) {
+      status_api.update({
+        name: repos.name,
+        owner: repos.owner.username,
+        status: -1
+      }, function (err) {});
+
       deploger.emit('build-err', {
         msg: err.message,
         err: err
