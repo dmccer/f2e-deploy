@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var download = require('./controller/download');
-var deploy = require('./controller/deploy');
+var push = require('./controller/push');
 var auth_service = require('./service/authorization');
 var progresor = require('./controller/progress');
 
@@ -23,5 +23,5 @@ router.use(function(req, res, next) {
 });
 
 router.get('/alpha/:name', download);
-router.post('/alpha', deploy);
+router.post('/alpha', push);
 router.get('/alpha/:owner/:name/progress', progresor);
