@@ -25,7 +25,7 @@ var repo = new Schema({
   // 关注者数量
   watchers: Number,
   // 项目私有
-  _private: Boolean
+  private: Boolean
 });
 
 // 返回数据给用户时，将 _id 属性重命名为 id
@@ -37,4 +37,8 @@ repo.set('toObject', {
   }
 });
 
+/**
+ * @module repo
+ * @type {*|Model}
+ */
 module.exports = mongoose.model('Repo', repo);
