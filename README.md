@@ -12,7 +12,24 @@ f2e-deploy
 5. 静态资源 tar.gz 包下载: http://localhost:9999/alpha/:name?owner=f2e&secret=xxxxxx
 6. 查看项目发布 log : http://localhost:9999/alpha/:name/log
 
-## TODO
+## Repo Site Features
 
-1. 更新项目发布状态到数据库
-2. 提供项目当前状态查询接口
+1. 搜索和查看项目
+2. 项目当前发布状态，及当前版本
+3. 项目版本切换
+4. 选择分支和环境发布
+5. 展示项目发布进度
+6. 项目发布权限控制 author & pusher & owner
+7. 私有项目发布
+
+
+version branch repo pusher & owner & author
+
+1. 分支与环境绑定，环境不同数据库不同
+
+DeployRepositoryRelation
+branch repo_id before after version pubers
+
+Repository
+id name owner_id url description website watchers
+
