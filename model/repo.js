@@ -11,7 +11,11 @@ var repo = new Schema({
   // 项目名
   name: String,
   // 项目拥有者或项目组名
-  owner: Object,
+  owner: {
+    name: String,
+    username: String,
+    email: String
+  },
   // 项目 git url
   url: String,
   // 项目描述
