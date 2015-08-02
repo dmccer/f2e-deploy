@@ -9,7 +9,7 @@ var deployment = new Schema({
   // 分支名
   branch: String,
   // 项目 id
-  repo_id: ObjectId,
+  repo_id: Schema.Types.ObjectId,
   // before commit
   before: String,
   // after commit
@@ -24,7 +24,11 @@ var deployment = new Schema({
   }],
   // 静态包下载地址
   download: String,
-  // 服务器发布状态，默认未发布
+  // 项目状态
+  // 0 - 空闲
+  // 1 - 发布中
+  status: { type: Number, default: 0 },
+  // 项目发布进度，默认未发布
   // -1 - 发布失败
   // 0 - 未发布
   // 1 - 正在下载项目资源
@@ -34,7 +38,7 @@ var deployment = new Schema({
   // 5 - 正在更新数据库版本
   // 6 - 正在生成静态资源压缩包
   // 7 - 发布完成
-  status: { type: Number, default: 0 },
+  progress: { type: Number, default: 0 },
   // 记录创建时间（首次发布时间）
   create_time: { type: Date, default: Date.now },
   // 记录更新时间（最后一次发布时间）
