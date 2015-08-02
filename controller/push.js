@@ -13,48 +13,52 @@ var deployment = require('../model/deployment');
  * @param repo_data
  * @returns {Promise}
  */
-function update_repo(repo_data) {
+function update_repo(repo_data, resolve, reject) {
+  var repo_id = repo_data.id;
   delete repo_data.id;
 
   return repo
     .findOneAndUpdate({
       name: repo_data.name,
-      owner: {
-        name: repo_data.owner.name
-      },
-      repo_id: repo_data.id,
+      repo_id: repo_id
     }, repo_data, {
       new: true,
       upsert: true
     })
-    .exec();
+    .exec(function(err, doc) {
+      if (err) {
+        return reject(err);
+      }
+
+      resolve(doc);
+    });
 }
 
 /**
  * 构造部署记录数据
  * @param body
  * @param repo
- * @returns {Mixed}
+ * @returns {Promise}
  */
 function build_deploy_data(body, repo) {
   console.info('写入 repository 成功');
-  console.dir(repo);
+  console.dir(repo.toObject());
   var pubers = [];
 
   pubers.push(body.repository.owner);
-  pubers.push(body.pusher);
+  //pubers.push(body.pusher);
 
-  body.commits.forEach(function(commit) {
-    pubers.push(commit.author);
-  });
+  //body.commits.forEach(function(commit) {
+  //  pubers.push(commit.author);
+  //});
 
-  return {
+  return Promise.resolve({
     branch: body.ref.replace('refs/heads/', ''),
-    repo_id: repo._id,
+    repo_id: repo.toObject().id,
     before: body.before,
     after: body.after,
     pubers: pubers
-  };
+  });
 }
 
 /**
@@ -63,8 +67,6 @@ function build_deploy_data(body, repo) {
  * @returns {Promise}
  */
 function update_deployment(deploy_data) {
-  console.debug('==== deploy_data:', arguments);
-
   deploy_data.$setOnInsert = {
     create_time: new Date()
   };
@@ -87,11 +89,13 @@ function update_deployment(deploy_data) {
  */
 function push_ok(res, deployment) {
   console.info('写入 deployment 成功:');
-  console.dir(deployment);
+  console.dir(deployment.toObject());
 
   res.status(200).json({
     msg: 'Push 处理成功'
   });
+
+  return Promise.resolve();
 }
 
 /**
@@ -117,14 +121,13 @@ function push_fail(res, body, err) {
  * @param req
  * @param res
  */
-module.exports = function(req, res) {
+module.exports = function (req, res) {
   var body = req.body;
+  var push_fail_bind = push_fail.bind(null, res, body);
 
-  console.log(body);
-
-  update_repo(body.repository)
+  new Promise(update_repo.bind(null, body.repository))
     .then(build_deploy_data.bind(null, body))
     .then(update_deployment)
-    .then(push_ok)
-    .catch(push_fail.bind(null, res, body));
+    .then(push_ok.bind(null, res))
+    .catch(push_fail_bind)
 }
