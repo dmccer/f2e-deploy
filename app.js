@@ -9,6 +9,8 @@ var web = require('./web');
 
 var app = express();
 
+require('./db');
+
 app.use(favicon(__dirname + '/favicon.png'));
 app.use(log4js.connectLogger(logger, { level: 'auto' }));
 app.use(bodyParser.urlencoded({ extended: false }));
