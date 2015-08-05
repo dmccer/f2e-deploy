@@ -23,6 +23,13 @@ f2e-deploy
 7. 私有项目发布
 
 
+## ChangeLog:
+
+### 2015-08-05
+1. push handler test
+
+## On Progress
+
 version branch repo pusher & owner & author
 
 1. 分支与环境绑定，环境不同数据库不同
