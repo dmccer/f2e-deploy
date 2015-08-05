@@ -16,15 +16,8 @@ app.use(bodyParser.json());
 require('../db');
 
 describe('contoller/push.js', function() {
-
   describe('module.exports()', function() {
     app.post('/alpha', push);
-
-    var _update_repo = push.__get__('update_repo');
-
-    afterEach(function() {
-      push.__set__('update_repo', _update_repo);
-    });
 
     var push_data = {
       ref: 'refs/heads/master',
@@ -62,13 +55,33 @@ describe('contoller/push.js', function() {
       "compare_url": "http://localhost:3000/unknwon/macaron/compare/f22f45d79a2ff050f0250a7df41f4944e6591853...5f69e7cedd45fcce5ea8f3116e9e20f15e90dafb"
     };
 
-    it('should create repo & deployment when push event trigger with new repo', function(done) {
-      request(app)
+    function trigger_push() {
+      return request(app)
         .post('/alpha')
         .set('Content-Type', 'application/json')
         .send(JSON.stringify(push_data))
         .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
+        .expect('Content-Type', /json/);
+    }
+
+    function throw_err(err) {
+      return function() {
+        throw err;
+      }
+    }
+
+    var _update_repo = push.__get__('update_repo');
+    var _build_deploy_data = push.__get__('build_deploy_data');
+    var _update_deployment = push.__get__('update_deployment');
+
+    afterEach(function() {
+      push.__set__('update_repo', _update_repo);
+      push.__set__('build_deploy_data', _build_deploy_data);
+      push.__set__('update_deployment', _update_deployment);
+    });
+
+    it('should create repo & deployment when push event trigger with new repo', function(done) {
+      trigger_push()
         .expect(200, {
           msg: 'Push 处理成功'
         }, done);
@@ -76,18 +89,29 @@ describe('contoller/push.js', function() {
 
     it('should throw error when update repo failed', function(done) {
       var err = new Error('update_repo error');
-      var update_repo = function() {
-        throw err;
-      };
+      push.__set__('update_repo', throw_err(err));
 
-      push.__set__('update_repo', update_repo);
+      trigger_push()
+        .expect(500, {
+          msg: 'Push 事件处理失败:' + err.message
+        }, done);
+    });
 
-      request(app)
-        .post('/alpha')
-        .set('Content-Type', 'application/json')
-        .send(JSON.stringify(push_data))
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
+    it('should throw error when build_deploy_data failed', function(done) {
+      var err = new Error('build_deploy_data error');
+      push.__set__('build_deploy_data', throw_err(err));
+
+      trigger_push()
+        .expect(500, {
+          msg: 'Push 事件处理失败:' + err.message
+        }, done);
+    });
+
+    it('should throw error when update_deployment failed', function(done) {
+      var err = new Error('update_deployment error');
+      push.__set__('update_deployment', throw_err(err));
+
+      trigger_push()
         .expect(500, {
           msg: 'Push 事件处理失败:' + err.message
         }, done);
