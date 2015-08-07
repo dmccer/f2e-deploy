@@ -8,16 +8,20 @@ block title
 
 block content
     h2 #{repo.name} #{repo.version}
-    p 项目拥有者: #{repo.owner}
+    p 项目拥有者: #{repo.owner.name}
     p
         a(href=repo.url) #{repo.url}
-    p 发布状态: #{repo.status_text}
+    .description #{repo.description}
 
-    div
-        button.publish(eid="publish-btn", repo="#{repo.owner}/#{repo.name}") 发布项目
-
-    div 发布进度
-        span.progress(eid="progress")
+    ul
+        each item in deployments
+            li
+                h3 分支：#{item.branch} #{item.version}
+                p 发布状态: #{item.status_text}
+                div
+                    button.publish(eid="publish-btn", repo="#{item.id}", disabled=Boolean(item.status)) 发布项目
+                div(class={ hidden: item.status === 0 }) 发布进度:
+                    span.progress(eid="progress") #{item.progress_text}
 
     script(src='http://cdn.staticfile.org/zepto/1.1.4/zepto.min.js')
     script(src='/js/progress.js')
