@@ -17,6 +17,8 @@ function update_repo(repo_data, resolve, reject) {
   var repo_id = repo_data.id;
   delete repo_data.id;
 
+  repo_data.owner_name = repo_data.owner.username;
+
   return repo
     .findOneAndUpdate({
       name: repo_data.name,
