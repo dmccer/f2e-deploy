@@ -1,9 +1,11 @@
 /**
- * Created by Kane on 15/7/30.
+ * Repo Site Controllers
+ * @type {*|Model|exports|module.exports}
  */
-var vermgr = require('../service/vermgr');
+var repo = require('../model/repo');
+var depoloyment = require('../model/deployment');
 
-var status = {
+var progress = {
   '-1': '发布失败',
   '0': '未发布',
   '1': '正在下载项目资源',
@@ -15,44 +17,84 @@ var status = {
   '7': '发布完成'
 };
 
-exports.list = function(req, res) {
-  var query = req.query;
-  delete query.secret;
+var status = {
+  '0': '空闲',
+  '1': '发布中'
+};
 
-  vermgr.list(query, function(err, body) {
+/**
+ * 首页项目列表页
+ * @param req
+ * @param res
+ */
+exports.list = function(req, res) {
+  repo.find({}, function(err, docs) {
     var r = {};
 
     if (err) {
       r.repos = [];
     } else {
-      body.forEach(function(item) {
-        item.status_text = status[item.status.toString()];
-      })
-      r.repos = body;
+      r.repos = docs;
     }
 
     return res.status(200).render('index', r);
   });
 }
 
+/**
+ * 项目详情页
+ * @param req
+ * @param res
+ */
 exports.repo = function(req, res) {
   var owner = req.params.owner;
   var name = req.params.name;
 
-  vermgr.get({
-    owner: owner,
-    name: name
-  }, function(err, body) {
-    var r = {};
+  var r = {};
+  new Promise(function(resolve, reject) {
+    repo.findOne({
+      name: name,
+      'owner.username': owner
+    }, function(err, doc) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(doc);
+    });
+  }).then(function(doc) {
+      r.repo = doc.toObject();
 
-    if (err) {
-      r.repo = {};
-    } else {
-      body.data.status_text = status[body.data.status.toString()];
+      return doc.id;
+    }, function(err) {
+      r.err = err;
+      res.status(200).render('repo', r);
 
-      r.repo = body.data;
-    }
+      throw err;
+    })
+    .then(function(repo_id) {
+      return depoloyment.find({
+        repo_id: repo_id
+      }).exec();
+    })
+    .then(function(docs) {
+      docs.forEach(function(doc) {
+        doc.progress_text = progress[doc.progress];
+        doc.status_text = status[doc.status];
+      });
 
-    return res.status(200).render('repo', r);
-  });
+      r.deployments = docs;
+
+      res.status(200).render('repo', r);
+    }, function(err) {
+      r.err = err;
+
+      res.status(200).render('repo', r);
+
+      throw err;
+    })
+    .catch(function(err) {
+      console.log('发生了点意外：');
+      console.log(err);
+    });
 }

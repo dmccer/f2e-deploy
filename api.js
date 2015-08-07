@@ -5,6 +5,7 @@ var download = require('./controller/download');
 var push = require('./controller/push');
 var auth_service = require('./service/authorization');
 var progresor = require('./controller/progress');
+var deployment = require('./controller/deployment');
 
 module.exports = router;
 
@@ -24,4 +25,5 @@ router.use(function(req, res, next) {
 
 router.get('/alpha/:name', download);
 router.post('/alpha', push);
+router.put('/alpha/deployment/:deployment_id', deployment);
 router.get('/alpha/:owner/:name/progress', progresor);
