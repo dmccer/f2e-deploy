@@ -23,7 +23,7 @@ router.use(function(req, res, next) {
   next();
 });
 
-router.get('/alpha/:name', download);
-router.post('/alpha', push);
-router.put('/alpha/deployment/:deployment_id', deployment);
-router.get('/alpha/:owner/:name/progress', progresor);
+router.get('/:name', download);
+router.post('/', push);
+router.put('/deployment/:deployment_id', deployment);
+router.get('/:owner/:name/progress', progresor);

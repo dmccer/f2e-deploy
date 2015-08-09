@@ -9,6 +9,7 @@ var web = require('./web');
 
 var app = express();
 
+require('es6-shim');
 require('./db');
 
 app.use(favicon(__dirname + '/favicon.png'));
