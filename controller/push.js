@@ -2,8 +2,6 @@
  * Web hook for Git server push event
  * @module controller/push
  * @author Kane yunhua.xiao@guluauto.com
- * @todo 封装成类
- * @todo 多线程处理
  */
 var repo = require('../model/repo');
 var deployment = require('../model/deployment');
