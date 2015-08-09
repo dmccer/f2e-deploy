@@ -8,6 +8,8 @@ var Schema = mongoose.Schema;
 var deployment = new Schema({
   // 分支名
   branch: String,
+  // 环境
+  env: { id: Schema.Types.ObjectId, alias: String },
   // 项目 id
   repo_id: Schema.Types.ObjectId,
   // before commit
