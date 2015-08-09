@@ -21,6 +21,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.12.2",
+    "es6-shim": "^0.33.0",
     "express": "^4.12.3",
     "jade": "^1.11.0",
     "jsonfile": "^2.0.0",

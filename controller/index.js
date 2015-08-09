@@ -4,6 +4,7 @@
  */
 var repo = require('../model/repo');
 var depoloyment = require('../model/deployment');
+var env = require('../model/deployment');
 
 var progress = {
   '-1': '发布失败',
@@ -51,6 +52,13 @@ exports.repo = function(req, res) {
   var name = req.params.name;
 
   var r = {};
+  function handle_err(err) {
+    r.err = err.message;
+    res.status(200).render('repo', r);
+
+    throw err;
+  }
+
   new Promise(function(resolve, reject) {
     repo.findOne({
       name: name,
@@ -66,33 +74,43 @@ exports.repo = function(req, res) {
       r.repo = doc.toObject();
 
       return doc.id;
-    }, function(err) {
-      r.err = err;
-      res.status(200).render('repo', r);
-
-      throw err;
-    })
+    }, handle_err)
     .then(function(repo_id) {
       return depoloyment.find({
         repo_id: repo_id
       }).exec();
     })
-    .then(function(docs) {
-      docs.forEach(function(doc) {
+    .then(function(deployments) {
+      return env
+        .find({})
+        .exec()
+        .then(function(envs) {
+          return Promise.resolve(deployments, envs);
+        });
+    }, handle_err)
+    .then(function(deployments, envs) {
+      var branches = [];
+
+      deployments.forEach(function(doc) {
         doc.progress_text = progress[doc.progress];
         doc.status_text = status[doc.status];
+
+        if (doc.env != null) {
+          branches.push(doc.branch);
+
+          var env_item = envs.find(function(env) {
+            return env.id.valueOf() === doc.env.id.valueOf()
+          });
+
+          env_item.deployment = doc;
+        }
       });
 
-      r.deployments = docs;
+      r.envs = envs;
+      r.branches = branches;
 
       res.status(200).render('repo', r);
-    }, function(err) {
-      r.err = err;
-
-      res.status(200).render('repo', r);
-
-      throw err;
-    })
+    }, handle_err)
     .catch(function(err) {
       console.log('发生了点意外：');
       console.log(err);

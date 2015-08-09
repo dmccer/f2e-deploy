@@ -14,14 +14,31 @@ block content
     .description #{repo.description}
 
     ul
-        each item in deployments
+        each env in envs
             li
-                h3 分支：#{item.branch} #{item.version}
-                p 发布状态: #{item.status_text}
-                div
-                    button.publish(eid="publish-btn", repo="#{item.id}", disabled=Boolean(item.status)) 发布项目
-                div(class={ hidden: item.status === 0 }) 发布进度:
-                    span.progress(eid="progress") #{item.progress_text}
+                h3 环境: #{env.name}
+                p #{env.description}
+
+                if env.deployment
+                    h4 分支：#{env.deployment.branch} #{env.deployment.version}
+                    p 发布状态: #{env.deployment.status_text}
+                    div
+                        button.publish(eid="publish-btn", deployment_id=env.deployment.id, disabled=Boolean(env.deployment.status)) 发布项目
+                    div(class={ hidden: env.deployment.status === 0 }) 发布进度:
+                        span.progress(eid="progress") #{env.deployment.progress_text}
+
+
+    div
+        select.env-list(eid="env-list")
+            each env in envs
+                option(value=env.id) #{env.name} - #{env.alias}
+
+        select.branch-list(eid="branch-list")
+            each branch in branches
+                option(value=branch) #{branch}
+
+        button.add-deployment(eid="add-deployment-btn")
+
 
     script(src='http://cdn.staticfile.org/zepto/1.1.4/zepto.min.js')
     script(src='/js/progress.js')
