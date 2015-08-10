@@ -15,7 +15,7 @@ router.use(function(req, res, next) {
   if (method === 'get' &&
     !auth_service.check(req.query.secret) ||
     method === 'post' && !auth_service.check(req.body.secret)) {
-    logger.warn('403 请求, ip: ' + req.ip);
+    //logger.warn('403 请求, ip: ' + req.ip);
     res.status(403).send('无权限');
     return;
   }
@@ -25,5 +25,5 @@ router.use(function(req, res, next) {
 
 router.get('/:name', download);
 router.post('/', push);
-router.put('/deployment/:deployment_id', deployment);
+router.post('/deployment/:repo_id', deployment);
 router.get('/:owner/:name/progress', progresor);
