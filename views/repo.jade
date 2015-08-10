@@ -29,15 +29,17 @@ block content
 
 
     div
-        select.env-list(eid="env-list")
-            each env in envs
-                option(value=env.id) #{env.name} - #{env.alias}
+        form(action="/f2e/deployment/#{repo.id}", method="POST")
+            select.env-list(eid="env-list", name="env_id")
+                each env in envs
+                    option(value=env.id) #{env.name} - #{env.alias}
 
-        select.branch-list(eid="branch-list")
-            each branch in branches
-                option(value=branch) #{branch}
+            select.branch-list(eid="branch-list", name="branch")
+                each branch in branches
+                    option(value=branch) #{branch}
 
-        button.add-deployment(eid="add-deployment-btn")
+            input(type="hidden", name="secret", value=default_secret)
+            button.add-deployment(eid="add-deployment-btn", type="submit") 提交配置
 
 
     script(src='http://cdn.staticfile.org/zepto/1.1.4/zepto.min.js')
