@@ -7,6 +7,7 @@ var path = require('path');
 var config = require('../config');
 var shell = require('shelljs');
 var deployment = require('../model/deployment');
+var _ = require('lodash');
 
 // args: repo_id, name, username, url, branch, after, suffix, env
 var default_args = {
@@ -14,7 +15,7 @@ var default_args = {
 };
 
 function Deployer(args) {
-  Object.assign(this.args = {}, default_args, args);
+  _.extend(this.args = {}, default_args, args);
   this.validate();
 }
 
