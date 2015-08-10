@@ -2,9 +2,11 @@
  * Repo Site Controllers
  * @type {*|Model|exports|module.exports}
  */
+var _ = require('lodash');
 var repo = require('../model/repo');
 var depoloyment = require('../model/deployment');
-var env = require('../model/deployment');
+var env = require('../model/env');
+var config = require('../config');
 
 var progress = {
   '-1': '发布失败',
@@ -85,34 +87,44 @@ exports.repo = function(req, res) {
         .find({})
         .exec()
         .then(function(envs) {
-          return Promise.resolve(deployments, envs);
+          return Promise.resolve({
+            deployments: deployments,
+            envs: envs
+          });
         });
     }, handle_err)
-    .then(function(deployments, envs) {
+    .then(function(mix) {
       var branches = [];
 
-      deployments.forEach(function(doc) {
+      mix.deployments.forEach(function(doc) {
         doc.progress_text = progress[doc.progress];
         doc.status_text = status[doc.status];
 
-        if (doc.env != null) {
-          branches.push(doc.branch);
+        if (doc.env.id != null) {
+          console.log(mix.envs, doc.env.id);
 
-          var env_item = envs.find(function(env) {
-            return env.id.valueOf() === doc.env.id.valueOf()
+          var env_item = _.find(mix.envs, function(env) {
+            return env.id.toString() === doc.env.id.toString()
           });
 
           env_item.deployment = doc;
+        } else {
+          branches.push(doc.branch);
         }
       });
 
-      r.envs = envs;
+      r.envs = mix.envs;
       r.branches = branches;
+      r.default_secret = config.default_secret;
 
       res.status(200).render('repo', r);
     }, handle_err)
     .catch(function(err) {
       console.log('发生了点意外：');
       console.log(err);
+
+      res.status(500).render('error', {
+        err: err
+      });
     });
 }
