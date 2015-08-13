@@ -30,13 +30,4 @@ f2e-deploy
 
 ## On Progress
 
-version branch repo pusher & owner & author
-
-1. 分支与环境绑定，环境不同数据库不同
-
-DeployRepositoryRelation
-branch repo_id before after version pubers
-
-Repository
-id name owner_id url description website watchers
-
+1. 绑定分支和环境
