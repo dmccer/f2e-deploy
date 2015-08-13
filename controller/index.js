@@ -101,8 +101,6 @@ exports.repo = function(req, res) {
         doc.status_text = status[doc.status];
 
         if (doc.env.id != null) {
-          console.log(mix.envs, doc.env.id);
-
           var env_item = _.find(mix.envs, function(env) {
             return env.id.toString() === doc.env.id.toString()
           });

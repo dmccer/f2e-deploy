@@ -6,6 +6,9 @@ extends ./layout
 block title
     title #{repo.name} - 静态资源发布管理
 
+block css
+    link(rel='stylesheet', href="/css/repo.css")
+
 block content
     h2 #{repo.name} #{repo.version}
     p 项目拥有者: #{repo.owner.name}
@@ -23,7 +26,7 @@ block content
                     h4 分支：#{env.deployment.branch} #{env.deployment.version}
                     p 发布状态: #{env.deployment.status_text}
                     div
-                        button.publish(eid="publish-btn", deployment_id=env.deployment.id, disabled=Boolean(env.deployment.status)) 发布项目
+                        button.publish(eid="publish-btn", owner=repo.owner.username, repo_name=repo.name, repo_id=repo.id, env_id=env.id, env_name=env.name, env_alias=env.alias, branch=env.deployment.branch, disabled=Boolean(env.deployment.status)) 发布项目
                     div(class={ hidden: env.deployment.status === 0 }) 发布进度:
                         span.progress(eid="progress") #{env.deployment.progress_text}
 
