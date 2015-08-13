@@ -6,6 +6,7 @@
 var deployment = require('../model/deployment');
 var repo = require('../model/repo');
 var env = require('../model/env');
+var config = require('../config');
 var Deployer = require('../service/deployer');
 
 module.exports = function(req, res) {
@@ -33,19 +34,28 @@ module.exports = function(req, res) {
           throw err;
         }
 
+        _deployment.status = 1;
         _deployment.env.id = _env._id;
-        _deployment.env.alias = env.alias;
+        _deployment.env.alias = _env.alias;
 
         _deployment.save();
 
         repo.findById(repo_id, function(err, _repo) {
           if (err) {
+            _deployment.status = 0;
+            _deployment.progress = 0;
+            _deployment.save();
+
+            res.status(500).json({
+              err: err.message
+            });
+
             throw err;
           }
 
           // 发布
           // repo_id, name, username, url, branch, after, suffix, env
-          var deployer = new Deployer({
+          var data = {
             repo_id: _deployment.repo_id,
             branch: _deployment.branch,
             after: _deployment.after,
@@ -53,21 +63,32 @@ module.exports = function(req, res) {
             username: _repo.owner.username,
             url: _repo.url,
             env: _env.alias
-          });
+          };
+
+          var deployer = new Deployer(data);
+
+          process.send({ access: 'deploying', workerid: process.pid });
 
           deployer
             .run()
             .then(function() {
+              _deployment.status = 0;
+              _deployment.save();
+
               res.status(200).json({
                 complete: true
               });
             })
             .catch(function(err) {
+              _deployment.status = 0;
+              _deployment.progress = 0;
+              _deployment.save();
+
               res.status(500).json({
                 err: err.message
               });
             });
-        });
+          });
       });
     });
   } catch (e) {

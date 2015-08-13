@@ -4,10 +4,13 @@
  * @module service/deploy
  */
 var path = require('path');
-var config = require('../config');
+var url = require('url');
 var shell = require('shelljs');
-var deployment = require('../model/deployment');
+var request = require('request');
 var _ = require('lodash');
+var config = require('../config');
+var deployment = require('../model/deployment');
+
 
 // args: repo_id, name, username, url, branch, after, suffix, env
 var default_args = {
@@ -54,7 +57,7 @@ Deployer.prototype.step = function(progress, status, version) {
     deployment.update({
       repo_id: self.args.repo_id,
       branch: self.args.branch,
-      env: self.args.env
+      'env.alias': self.args.env
     }, data, function(err) {
       if (err) {
         return reject(err);
@@ -66,7 +69,13 @@ Deployer.prototype.step = function(progress, status, version) {
 }
 
 Deployer.prototype.run = function() {
-  return this.prepare()
+  return new Promise(function(resolve, reject) {
+    try {
+      resolve(this.prepare());
+    } catch (err) {
+      reject(err);
+    }
+  }.bind(this))
     .then(this.fetch.bind(this))
     .then(this.build.bind(this))
     .then(this.read_pkg.bind(this))
@@ -168,16 +177,16 @@ Deployer.prototype.sync_server = function() {
   var src = path.resolve(this.out_dir, this.pkg.dest, './*');
 
   var err, err_msg;
-  var mk_dest_dir = shell.exec('sudo mkdir -p ' + dest_dir);
+  var mk_dest_dir = shell.exec('mkdir -p ' + this.dest_dir);
   if (mk_dest_dir.code !== 0) {
-    err_msg = '创建静态服务器目录' + dest_dir + '失败';
+    err_msg = '创建静态服务器目录' + this.dest_dir + '失败';
     err = new Error(err_msg);
 
     throw err;
   }
 
   var sync_src = shell.exec([
-    'sudo cp -rf',
+    'cp -rf',
     src,
     this.dest_dir
   ].join(' '));
@@ -269,7 +278,7 @@ Deployer.prototype.generate_tar_gz = function() {
 
   var err_msg, err;
   var tar_gz_tip_prefix = '生成静态资源压缩包' + tar_gz_file;
-  var tar_gz = shell.exec('sudo tar -czvf ' + this.pkg.version + this.args.suffix + ' ' + this.pkg.version);
+  var tar_gz = shell.exec('tar -czvf ' + this.pkg.version + this.args.suffix + ' ' + this.pkg.version);
   shell.cd(config.root);
   if (tar_gz.code !== 0) {
     err_msg = tar_gz_tip_prefix + '失败';
