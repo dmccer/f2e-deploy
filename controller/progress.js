@@ -1,32 +1,36 @@
 var path = require('path');
 var _ = require('lodash');
 var config = require('../config');
-var vermgr = require('../service/vermgr');
+var deployment = require('../model/deployment');
 
 module.exports = function(req, res) {
-  var owner = _.trim(req.params.owner);
-  var name = _.trim(req.params.name);
+  var repo_id = _.trim(req.params.repo_id);
+  var branch = _.trim(req.query.branch);
+  var env = _.trim(req.query.env);
 
-  vermgr.get({
-    name: name,
-    owner: owner
-  }, function(err, body) {
+  process.send({ access: '/progress', workerid: process.pid });
+
+  deployment.findOne({
+    repo_id: repo_id,
+    branch: branch,
+    'env.alias': env
+  },  function(err, doc) {
     if (err) {
       return res.status(500).json({
         msg: err.message
       });
     }
 
-    var repos = body.data || {};
+    var deployment_item = doc || {};
 
-    if (repos.status === -1) {
+    if (deployment_item.progress === -1) {
       return res.status(200).json({
         fail: true
       });
     }
 
     return res.status(200).json({
-      progress: Math.floor(repos.status / 7 * 100)
+      progress: Math.floor(deployment_item.progress / 7 * 100)
     });
   });
 };
