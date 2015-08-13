@@ -7,7 +7,7 @@ var request = require('request');
 
 var vermgr = {
   get: function(params, callback) {
-    var _url = url.resolve(config.vermgr.url, 'repos/' + params.name);
+    var _url = url.resolve(config[params.env].vermgr.url, 'repos/' + params.name);
     var opt = {
       method: 'GET',
       url: _url,
@@ -15,7 +15,7 @@ var vermgr = {
         owner: params.owner
       },
       headers: {
-        Authorization: config.vermgr.authorization
+        Authorization: config[params.env].vermgr.authorization
       }
     };
 
@@ -31,13 +31,13 @@ var vermgr = {
   },
 
   list: function(params, callback) {
-    var _url = url.resolve(config.vermgr.url, 'repos');
+    var _url = url.resolve(config[params.env].vermgr.url, 'repos');
     var opt = {
       method: 'GET',
       url: _url,
       qs: params,
       headers: {
-        Authorization: config.vermgr.authorization
+        Authorization: config[params.env].vermgr.authorization
       }
     };
 
@@ -53,7 +53,7 @@ var vermgr = {
   },
 
   update: function(params, callback) {
-    var _url = url.resolve(config.vermgr.url, 'repos/' + params.name);
+    var _url = url.resolve(config[params.env].vermgr.url, 'repos/' + params.name);
 
     var opt = {
       method: 'POST',
@@ -64,7 +64,7 @@ var vermgr = {
         status: params.status
       },
       headers: {
-        Authorization: config.vermgr.authorization
+        Authorization: config[params.env].vermgr.authorization
       }
     };
 
