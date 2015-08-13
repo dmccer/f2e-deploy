@@ -26,4 +26,4 @@ router.use(function(req, res, next) {
 router.get('/:name', download);
 router.post('/', push);
 router.post('/deployment/:repo_id', deployment);
-router.get('/:owner/:name/progress', progresor);
+router.get('/deployment/:repo_id/progress', progresor);

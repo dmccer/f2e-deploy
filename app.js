@@ -22,10 +22,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', web);
 app.use('/f2e', api);
 
-var server = app.listen(9999, function () {
+module.exports = app;
 
-  var host = server.address().address;
-  var port = server.address().port;
 
-  logger.info('静态资源发布服务器已启动，地址：' + host + '，端口:' + port);
-});
