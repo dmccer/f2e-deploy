@@ -58,7 +58,7 @@ deployment.set('toObject', {
 });
 
 /**
- * @module Deployment
+ * @module model/Deployment
  * @type {*|Model}
  */
 module.exports = mongoose.model('Deployment', deployment);

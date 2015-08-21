@@ -38,7 +38,7 @@ repo.set('toObject', {
 });
 
 /**
- * @module repo
+ * @module model/Repo
  * @type {*|Model}
  */
 module.exports = mongoose.model('Repo', repo);
