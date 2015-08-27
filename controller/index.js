@@ -35,6 +35,7 @@ exports.list = function(req, res) {
     var r = {};
 
     if (err) {
+      r.err = err;
       r.repos = [];
     } else {
       r.repos = docs;
