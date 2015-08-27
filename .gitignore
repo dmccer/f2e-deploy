@@ -3,6 +3,7 @@ deploy/
 log/
 conf.json
 config.js
+bower_components/
 
 # Numerous always-ignore extensions
 *.bak
