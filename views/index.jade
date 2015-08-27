@@ -4,20 +4,28 @@
 extends ./layout
 
 block title
-    title 静态资源发布管理
+    title MIDWIFE - 静态资源发布管理
 
+block css
+    link(rel='stylesheet', href="/css/repo-list.css")
+        
 block content
-    ul
-        each item in repos
-            li
-                h3
-                    a(href="/repos/#{item.owner.username}/#{item.name}") #{item.owner.name} / #{item.name}
-                p
-                    a(href=item.url) #{item.url}
-                p
-                    | 站点:
-                    a(href=item.website) #{item.website}
-                .description #{item.description}
-
-
-
+    .page
+        if err
+            .page-err-tip #{err.message}
+        else
+            ul.repo-list
+                each item in repos
+                    li
+                        h2
+                            a(href="/repos/#{item.owner.username}/#{item.name}") #{item.owner.name} / #{item.name}
+                        p
+                            span Git: 
+                            a(href=item.url) #{item.url}
+                        if item.website
+                            p 
+                              span Site: 
+                              a(href=item.website) #{item.website}
+                        if item.description        
+                            .description 
+                              div #{item.description}

@@ -4,45 +4,70 @@
 extends ./layout
 
 block title
-    title #{repo.name} - 静态资源发布管理
+    title #{repo.name} - MIDWIFE -静态资源发布管理
 
 block css
     link(rel='stylesheet', href="/css/repo.css")
 
 block content
-    h2 #{repo.name} #{repo.version}
-    p 项目拥有者: #{repo.owner.name}
-    p
-        a(href=repo.url) #{repo.url}
-    .description #{repo.description}
+    .page
+        if err
+            .page-err-tip #{err.message}
+        else
+            h2.repo-title
+              a(href=repo.url) 
+                span.owner #{repo.owner.name}
+                span.name #{repo.name}
+                if repo.version
+                    span.version #{repo.version}
+                
+            .description #{repo.description}
 
-    ul
-        each env in envs
-            li
-                h3 环境: #{env.name}
-                p #{env.description}
-
-                if env.deployment
-                    h4 分支：#{env.deployment.branch} #{env.deployment.version}
-                    p 发布状态: #{env.deployment.status_text}
-                    div
-                        button.publish(eid="publish-btn", owner=repo.owner.username, repo_name=repo.name, repo_id=repo.id, env_id=env.id, env_name=env.name, env_alias=env.alias, branch=env.deployment.branch, disabled=Boolean(env.deployment.status)) 发布项目
-                    div(class={ hidden: env.deployment.status === 0 }) 发布进度:
-                        span.progress(eid="progress") #{env.deployment.progress_text}
-
-
-    div
-        form(action="/f2e/deployment/#{repo.id}", method="POST")
-            select.env-list(eid="env-list", name="env_id")
+            ul.envs
                 each env in envs
-                    option(value=env.id) #{env.name} - #{env.alias}
+                    li
+                        .env_header
+                            h3 #{env.name}
+                            p.env_desc #{env.description}
 
-            select.branch-list(eid="branch-list", name="branch")
-                each branch in branches
-                    option(value=branch) #{branch}
+                        if env.deployment
+                            .env_info
+                                p 代码分支: 
+                                    i.flag #{env.deployment.branch}
+                                
+                                p 当前版本: 
+                                    i.flag #{env.deployment.version || '未发布'}
+                                    
+                                p 发布状态: 
+                                    i.flag #{env.deployment.status_text}
+                                p(class={ hidden: env.deployment.status === 0 }) 发布进度: 
+                                    i.flag.progress(eid="progress") #{env.deployment.progress_text}
+                                    
+                            div.field
+                                button.btn.publish(eid="publish-btn", owner=repo.owner.username, repo_name=repo.name, repo_id=repo.id, env_id=env.id, env_name=env.name, env_alias=env.alias, branch=env.deployment.branch, disabled=Boolean(env.deployment.status)) 发布项目
+                        else
+                            .unconfig 环境未配置
+                                br
+                                a(href="#config-env") 点击配置
 
-            input(type="hidden", name="secret", value=default_secret)
-            button.add-deployment(eid="add-deployment-btn", type="submit") 提交配置
+            div.config-panel#config-env
+                h3 配置环境
+                form(action="/f2e/deployment/#{repo.id}", method="POST", class="form")
+                    .field
+                        label.label 选择环境
+                        .control
+                            select.env-list(eid="env-list", name="env_id")
+                                each env in envs
+                                    option(value=env.id) #{env.name} - #{env.alias}
+                    .field
+                        label.label 选择分支
+                        .control
+                            select.branch-list(eid="branch-list", name="branch", disabled=Boolean(!!branches.length))
+                                each branch in branches
+                                    option(value=branch) #{branch}
+
+                    input(type="hidden", name="secret", value=default_secret)
+                    button.btn.add-deployment(eid="add-deployment-btn", type="submit") 提交配置
 
 
     script(src='http://cdn.staticfile.org/zepto/1.1.4/zepto.min.js')
