@@ -1,0 +1,19 @@
+{
+  "name": "f2e-deploy",
+  "version": "0.0.1",
+  "authors": [
+    "Kane <dmccer@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "normalize.css": "~3.0.3",
+    "zepto": "git@github.com:madrobby/zepto.git#~1.1.6"
+  }
+}
