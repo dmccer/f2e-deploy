@@ -1,0 +1,58 @@
+@import '../global/site.variable';
+@import '../global/util.less';
+@import './common/layout.less';
+
+@itemPadding: 15px;
+
+.page {
+  width: 80%;
+}
+
+.repo-list {
+  list-style: none;
+  padding-left: 0;
+
+  > li {
+    margin-bottom: @itemPadding;
+
+    h2 {
+      margin-bottom: 10px;
+
+      a {
+        display: inline-block;
+        font-size: 22px;
+        padding: 5px 15px;
+        background-color: @teal;
+        color: @white;
+        font-weight: normal;
+
+        &:hover {
+          color: darken(@white, 10%);;
+        }
+      }
+    }
+
+    p a {
+      color: #999999;
+
+      &:hover {
+        color: #333333;
+      }
+    }
+
+    p {
+      color: #999999;
+      margin-bottom: 5px;
+
+      span {
+        padding-right: 5px;
+      }
+    }
+
+    .description {
+      margin-top: 15px;
+      background-color: lighten(@lightBlack, 72%);
+      padding: @itemPadding;
+    }
+  }
+}

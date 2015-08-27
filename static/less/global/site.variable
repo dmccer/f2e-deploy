@@ -1,0 +1,128 @@
+/*-------------------
+       Fonts
+--------------------*/
+
+@headerFont        : 'Helvetica Neue', Helvetica, STHeiTi, Arial, sans-serif;
+@pageFont          : 'Helvetica Neue', Helvetica, STHeiTi, Arial, sans-serif;
+@fontSmoothing     : antialiased;
+
+/*-------------------
+      Base Sizes
+--------------------*/
+
+@emSize   : 14px;
+@fontSize : 14px;
+
+/*--------------
+  Page Heading
+---------------*/
+
+@headerFontWeight : bold;
+@headerLineHeight : 1.33em;
+
+/* Used to match floats with text */
+@lineHeightOffset       : ((@lineHeight - 1em) / 2);
+@headerLineHeightOffset : (@headerLineHeight - 1em) / 2;
+
+@h1               : 2rem;
+@h2               : 1.714rem;
+@h3               : 1.28rem;
+@h4               : 1.071rem;
+@h5               : 1rem;
+
+/* Header Spacing */
+@headerTopMargin    : ~"calc(2rem - "@headerLineHeightOffset~")";
+@headerBottomMargin : 1rem;
+@headerMargin       : @headerTopMargin 0em @headerBottomMargin;
+
+/*-------------------
+      Site Colors
+--------------------*/
+
+/*---  Colors  ---*/
+@black            : #1B1C1D;
+@blue             : #3B83C0;
+@green            : #5BBD72;
+@grey             : #CCCCCC;
+@orange           : #E07B53;
+@pink             : #D9499A;
+@purple           : #564F8A;
+@red              : #D95C5C;
+@teal             : #00B5AD;
+@yellow           : #F2C61F;
+
+/*---  Light Colors  ---*/
+@lightBlack       : #333333;
+@lightBlue        : #54C8FF;
+@lightGreen       : #2ECC40;
+@lightOrange      : #FF851B;
+@lightPink        : #FF8EDF;
+@lightPurple      : #CDC6FF;
+@lightRed         : #FF695E;
+@lightTeal        : #6DFFFF;
+@lightYellow      : #FFE21F;
+
+/*---   Neutrals  ---*/
+@fullBlack        : #000000;
+@darkGrey         : #AAAAAA;
+@lightGrey        : #DCDDDE;
+@offWhite         : #FAFAFA;
+@darkWhite        : #F0F0F0;
+@white            : #FFFFFF;
+
+/*-------------------
+        Sizes
+--------------------*/
+
+/*
+  To have sizing resolve to a specified pixel values adjust
+  the numerator to the desired font size and the denominator
+  to the base em size
+*/
+
+@miniSize        : (10 / 14);
+@tinySize        : (12 / 14);
+@smallSize       : (13 / 14);
+@mediumSize      : (14 / 14);
+@largeSize       : (16 / 14);
+@bigSize         : (18 / 14);
+@hugeSize        : (20 / 14);
+@massiveSize     : (24 / 14);
+
+/*-------------------
+        Page
+--------------------*/
+
+@pageBackground      : #F7F7F7;
+@pageOverflowX       : hidden;
+
+@lineHeight          : 1.33;
+@textColor           : rgba(0, 0, 0, 0.8);
+
+/* Minimum Mobile Width */
+@pageMinWidth       : 320px;
+
+/*-------------------
+      Paragraph
+--------------------*/
+
+@paragraphMargin     : 0em 0em 1em;
+@paragraphLineHeight : @lineHeight;
+
+/*-------------------
+       Links
+--------------------*/
+
+@linkColor           : #009FDA;
+@linkUnderline       : none;
+@linkHoverColor      : lighten(@linkColor, 5);
+
+/*-------------------
+  Highlighted Text
+--------------------*/
+
+@highlightBackground      : #CCE2FF;
+@highlightColor           : @textColor;
+
+@inputHighlightBackground : rgba(100, 100, 100, 0.4);
+@inputHighlightColor      : @textColor;

@@ -1,0 +1,133 @@
+@import './site.variable';
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  font-size: @emSize;
+  // user-select: none;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  min-width: @pageMinWidth;
+  background: @pageBackground;
+  font-family: @pageFont;
+  font-size: @fontSize;
+  line-height: @lineHeight;
+  color: @textColor;
+  font-smoothing: @fontSmoothing;
+}
+
+/*******************************
+             Headers
+*******************************/
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: @headerFont;
+  line-height: @headerLineHeight;
+  margin: @headerMargin;
+  font-weight: @headerFontWeight;
+  padding: 0;
+}
+
+h1 {
+  min-height: 1rem;
+  font-size: @h1;
+}
+h2 {
+  font-size: @h2;
+}
+h3 {
+  font-size: @h3;
+}
+h4 {
+  font-size: @h4;
+}
+h5 {
+  font-size: @h5;
+}
+
+h1:first-child,
+h2:first-child,
+h3:first-child,
+h4:first-child,
+h5:first-child {
+  margin-top: 0em;
+}
+
+/*******************************
+             Text
+*******************************/
+
+p {
+  margin: @paragraphMargin;
+  line-height: @paragraphLineHeight;
+}
+p:first-child {
+  margin-top: 0em;
+}
+p:last-child {
+  margin-bottom: 0em;
+}
+
+/*-------------------
+        Links
+--------------------*/
+
+a {
+  color: @linkColor;
+  text-decoration: @linkUnderline;
+}
+a:hover {
+  color: @linkHoverColor;
+}
+
+/*******************************
+          Highlighting
+*******************************/
+
+/* Site */
+::selection {
+  background-color: @highlightBackground;
+  color: @highlightColor;
+}
+
+/* Form */
+button,
+input,
+select,
+textarea {
+  font-family: @fontSize;
+}
+
+input, textarea {
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  -webkit-user-modify: read-write-plaintext-only;
+  outline: none !important;
+}
+
+textarea::selection,
+input::selection {
+  background-color: @inputHighlightBackground;
+  color: @inputHighlightColor;
+}
+
+/* 禁止长按链接与图片弹出菜单 */
+a, img {
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+/* icon */
+i {
+  font-style: normal;
+}

@@ -1,0 +1,57 @@
+@pageWidth: auto;
+@headerPadding: 15px;
+@headerBgColor: darken(@teal, 5%);
+@headerTextColor: #ffffff;
+@headerFontSize: 28px;
+@headerHeight: 60px;
+@defaultPadding: 15px;
+@defaultMargin: 15px;
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: @headerHeight;
+  line-height: @headerHeight;
+  background-color: @headerBgColor;
+  color: @headerTextColor;
+  font-size: @headerFontSize;
+  padding-left: @headerPadding;
+  padding-right: @headerPadding;
+  z-index: 9999;
+
+  a {
+    color: @headerTextColor;
+  }
+}
+
+.page {
+  width: @pageWidth;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: @headerHeight;
+  padding-top: @defaultPadding;
+}
+
+.page-err-tip {
+  padding: @defaultPadding;
+  background-color: #faefc2;
+  color: #9d8713;
+  margin-bottom: @defaultMargin;
+}
+
+.footer {
+  margin-top: 80px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: lighten(@lightBlack, 30%);
+
+  a {
+    color: lighten(@lightBlack, 30%);
+
+    &:hover {
+      color: @lightBlack;
+    }
+  }
+}
