@@ -52,23 +52,27 @@ block content
 
             div.config-panel#config-env
                 h3 配置环境
-                form(action="/f2e/deployment/#{repo.id}", method="POST", class="form")
+                form(eid="config-form", class="form")
                     .field
                         label.label 选择环境
                         .control
-                            select.env-list(eid="env-list", name="env_id")
+                            select.env-list(eid="env-id", name="env_id")
                                 each env in envs
                                     option(value=env.id) #{env.name} - #{env.alias}
                     .field
                         label.label 选择分支
                         .control
-                            select.branch-list(eid="branch-list", name="branch", disabled=Boolean(!!branches.length))
+                            select.branch-list(eid="branch", name="branch", disabled=Boolean(!!branches.length))
                                 each branch in branches
                                     option(value=branch) #{branch}
-
-                    input(type="hidden", name="secret", value=default_secret)
-                    button.btn.add-deployment(eid="add-deployment-btn", type="submit") 提交配置
+                    .field
+                        label.label 发布进度
+                        .control
+                            i.flag.progress(eid="config-publish-progress")
+                            
+                    input(type="hidden", eid="repo_id", name="repo_id", value=repo.id)
+                    button.btn.add-deployment(eid="config-btn", type="submit") 提交配置
 
 
     script(src='http://cdn.staticfile.org/zepto/1.1.4/zepto.min.js')
-    script(src='/js/progress.js')
+    script(src='/js/repo.js')
