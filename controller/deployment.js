@@ -9,16 +9,30 @@ var env = require('../model/env');
 var config = require('../config');
 var Deployer = require('../service/deployer');
 
+function validator(repo_id, env_id, branch) {
+  return repo_id && env_id && branch;
+}
+
 module.exports = function(req, res) {
   var repo_id = req.params.repo_id;
+  var branch = req.body.branch;
+  var env_id = req.body.env_id;
 
   try {
+    if (!validator(repo_id, env_id, branch)) {
+      throw new Error('环境配置参数不正确 repo_id, env_id, branch');
+    }
+
     deployment.findOne({
       repo_id: repo_id,
-      branch: req.body.branch
+      branch: branch
     }, function(err, _deployment) {
       if (err) {
         throw err;
+      }
+
+      if (!_deployment) {
+        throw new Error('根据您的配置, 没有找到相应的环境');
       }
 
       // 发布中
@@ -29,7 +43,7 @@ module.exports = function(req, res) {
         });
       }
 
-      env.findById(req.body.env_id, function(err, _env) {
+      env.findById(env_id, function(err, _env) {
         if (err) {
           throw err;
         }
