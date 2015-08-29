@@ -1,15 +1,23 @@
 doctype html
 html
-   head
-      block title
-         title MIDWIFE - 静态资源管理
-      link(rel='stylesheet', href="/css/global.css")
-      block css
-   body
-       h1.header
-           a(href="/") MIDWIFE
-           
-       block content
-       
-       .footer &copy; 2015 版权所有 
-          a(href="http://svger.com") svger.com
+	head
+		block title
+			title MIDWIFE - 静态资源管理
+		link(rel='stylesheet', href="/css/global.css")
+		block css
+	body
+		.header
+			h1
+				a(href="/") MIDWIFE
+			if user
+				.user
+					span 欢迎使用,
+						b #{user.username}
+					| |
+					a(href="/logout") 退出
+			
+
+		block content
+
+		.footer &copy; 2015 版权所有 
+			a(href="http://svger.com") svger.com

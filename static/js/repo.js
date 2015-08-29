@@ -101,17 +101,10 @@ $(function() {
               _: Date.now()
             },
             success: function(res) {
-              if (self.timer && res.fail) {
-                clearTimeout(self.timer);
-                self.publishing = false;
-                return $progress.text('发布失败');
-              }
+              $progress.text(self.timer && res.fail ? '发布失败' : res.progress + '%');
 
-              $progress.text(res.progress + '%');
-
-              if (res.progress === 100) {
+              if (!self.publishing) {
                 clearTimeout(self.timer);
-                self.publishing = false;
                 return;
               }
 

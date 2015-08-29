@@ -1,16 +1,10 @@
 @import '../global/site.variable';
 @import '../global/util.less';
 @import './common/layout.less';
+@import './common/form.less';
+@import './common/flag.less';
 
 @itemPadding: 15px;
-
-.page {
-  width: 80%;
-}
-
-// .hidden {
-//   display: none;
-// }
 
 .repo-title {
   .clearfix();
@@ -42,20 +36,6 @@
 .description {
   background-color: lighten(@lightBlack, 72%);
   padding: @itemPadding;
-}
-
-.flag {
-  display: inline-block;
-  padding: 5px 10px;
-  background-color: @black;
-  color: @white;
-  margin-right: 5px;
-  font-weight: normal;
-  border-radius: 2px;
-
-  &:last-child {
-    margin-right: 0;
-  }
 }
 
 .envs {
@@ -134,38 +114,4 @@
 
 .config-panel {
   padding-bottom: 100px;
-}
-
-.btn {
-  display: block;
-  width: 100%;
-  border: none;
-  background-color: darken(@orange, 10%);;
-  color: #fff;
-  font-size: 16px;
-  text-align: center;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  border-radius: 2px;
-}
-
-.form {
-  @fieldMargin: 15px;
-
-  .field {
-    margin-bottom: @fieldMargin;
-
-    .label {
-      display: inline-block;
-      margin-bottom: 5px;
-    }
-  }
-}
-select {
-  display: inline-block;
-  width: 100%;
-  font-size: 14px;
-  height: 37px;
-  line-height: 37px;
-  border: 1px solid @grey;
 }

@@ -1,78 +1,78 @@
 //
-   Created by Kane on 15/7/30.
+	Created by Kane on 15/7/30.
 
 extends ./layout
 
 block title
-    title #{repo.name} - MIDWIFE -静态资源发布管理
+	title #{repo.name} - MIDWIFE -静态资源发布管理
 
 block css
-    link(rel='stylesheet', href="/css/repo.css")
+	link(rel='stylesheet', href="/css/repo.css")
 
 block content
-    .page
-        if err
-            .page-err-tip #{err.message}
-        else
-            h2.repo-title
-              a(href=repo.url) 
-                span.owner #{repo.owner.name}
-                span.name #{repo.name}
-                if repo.version
-                    span.version #{repo.version}
-                
-            .description #{repo.description}
+	.page
+		if err
+			.page-err-tip #{err.message}
+		else
+			h2.repo-title
+				a(href=repo.url) 
+					span.owner #{repo.owner.name}
+					span.name #{repo.name}
+					if repo.version
+						span.version #{repo.version}
 
-            ul.envs
-                each env in envs
-                    li
-                        .env_header
-                            h3 #{env.name}
-                            p.env_desc #{env.description}
+			.description #{repo.description}
 
-                        if env.deployment
-                            .env_info
-                                p 代码分支: 
-                                    i.flag #{env.deployment.branch}
-                                
-                                p 当前版本: 
-                                    i.flag #{env.deployment.version || '未发布'}
-                                    
-                                p 发布状态: 
-                                    i.flag #{env.deployment.status_text}
-                                p(class={ hidden: env.deployment.status === 0 }) 发布进度: 
-                                    i.flag.progress(eid="progress") #{env.deployment.progress_text}
-                                    
-                            div.field
-                                button.btn.publish(eid="publish-btn", owner=repo.owner.username, repo_name=repo.name, repo_id=repo.id, env_id=env.id, env_name=env.name, env_alias=env.alias, branch=env.deployment.branch, disabled=Boolean(env.deployment.status)) 发布项目
-                        else
-                            .unconfig 环境未配置
-                                br
-                                a(href="#config-env") 点击配置
+			ul.envs
+				each env in envs
+					li
+						.env_header
+							h3 #{env.name}
+							p.env_desc #{env.description}
 
-            div.config-panel#config-env
-                h3 配置环境
-                form(eid="config-form", class="form")
-                    .field
-                        label.label 选择环境
-                        .control
-                            select.env-list(eid="env-id", name="env_id")
-                                each env in envs
-                                    option(value=env.id) #{env.name} - #{env.alias}
-                    .field
-                        label.label 选择分支
-                        .control
-                            select.branch-list(eid="branch", name="branch", disabled=Boolean(!!branches.length))
-                                each branch in branches
-                                    option(value=branch) #{branch}
-                    .field
-                        label.label 发布进度
-                        .control
-                            i.flag.progress(eid="config-publish-progress")
-                            
-                    input(type="hidden", eid="repo_id", name="repo_id", value=repo.id)
-                    button.btn.add-deployment(eid="config-btn", type="submit") 提交配置
+						if env.deployment
+							.env_info
+								p 代码分支: 
+									i.flag #{env.deployment.branch}
+
+								p 当前版本: 
+									i.flag #{env.deployment.version || '未发布'}
+
+								p 发布状态: 
+									i.flag #{env.deployment.status_text}
+								p(class={ hidden: env.deployment.status === 0 }) 发布进度: 
+									i.flag.progress(eid="progress") #{env.deployment.progress_text}
+
+							div.field
+								button.btn.publish(eid="publish-btn", owner=repo.owner.username, repo_name=repo.name, repo_id=repo.id, env_id=env.id, env_name=env.name, env_alias=env.alias, branch=env.deployment.branch, disabled=Boolean(env.deployment.status)) 发布项目
+						else
+							.unconfig 环境未配置
+								br
+								a(href="#config-env") 点击配置
+
+			div.config-panel#config-env
+				h3 配置环境
+				form(eid="config-form", class="form")
+					.field
+						label.label 选择环境
+						.control
+							select.env-list(eid="env-id", name="env_id")
+								each env in envs
+									option(value=env.id) #{env.name} - #{env.alias}
+					.field
+						label.label 选择分支
+						.control
+							select.branch-list(eid="branch", name="branch", disabled=Boolean(!!branches.length))
+								each branch in branches
+									option(value=branch) #{branch}
+					.field
+						label.label 发布进度
+						.control
+							i.flag.progress(eid="config-publish-progress")
+
+					input(type="hidden", eid="repo_id", name="repo_id", value=repo.id)
+					button.btn.add-deployment(eid="config-btn", type="submit") 提交配置
 
 
-    script(src='http://cdn.staticfile.org/zepto/1.1.4/zepto.min.js')
-    script(src='/js/repo.js')
+	script(src='http://cdn.staticfile.org/zepto/1.1.4/zepto.min.js')
+	script(src='/js/repo.js')

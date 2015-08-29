@@ -1,0 +1,30 @@
+doctype html
+html
+	head
+		title 登录 - MIDWIFE - 静态资源发布管理
+		link(rel='stylesheet', href="/css/global.css")
+		link(rel='stylesheet', href="/css/login.css")
+
+	body
+		if err
+			.page-err-tip #{err}
+			
+		h1
+			a(href="/") MIDWIFE
+			br
+			span 助产系统
+		.page
+			form.form.login(action="/login", method="POST")
+				.field
+					label.label 账户名
+					.control
+						input(type="text", name="username", placeholder="账户名")
+				.field
+					label.label 密码
+					.control
+						input(type="password", name="password", placeholder="密码")
+				.field
+					button.btn(type="submit") 登录
+
+			.footer &copy; 2015 版权所有 
+				a(href="http://svger.com") svger.com

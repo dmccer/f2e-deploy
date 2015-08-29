@@ -1,5 +1,5 @@
-@pageWidth: auto;
-@headerPadding: 15px;
+@pageWidth: 80%;
+@headerPadding: 30px;
 @headerBgColor: darken(@teal, 5%);
 @headerTextColor: #ffffff;
 @headerFontSize: 28px;
@@ -16,13 +16,52 @@
   line-height: @headerHeight;
   background-color: @headerBgColor;
   color: @headerTextColor;
-  font-size: @headerFontSize;
-  padding-left: @headerPadding;
-  padding-right: @headerPadding;
   z-index: 9999;
 
-  a {
-    color: @headerTextColor;
+  h1 {
+    font-size: @headerFontSize;
+    height: 100%;
+    float: left;
+    margin-bottom: 0;
+
+    a {
+      display: block;
+      line-height: @headerHeight;
+      color: @headerTextColor;
+      padding-left: @headerPadding;
+      padding-right: @headerPadding;
+    }
+  }
+
+  .user {
+    float: right;
+    height: 100%;
+
+    span, a {
+      display: inline-block;
+    }
+
+    span {
+      padding-right: @defaultPadding;
+    }
+
+    b {
+      font-size: 22px;
+      text-transform: capitalize;
+      padding-left: 10px;
+      color: @yellow;
+    }
+
+    a {
+      color: @white;
+      padding-left: @defaultPadding;
+      padding-right: @defaultPadding;
+      margin-right: @defaultMargin;
+
+      &:hover {
+        color: darken(@white, 10%);
+      }
+    }
   }
 }
 
@@ -54,4 +93,8 @@
       color: @lightBlack;
     }
   }
+}
+
+.hidden {
+  display: none;
 }
