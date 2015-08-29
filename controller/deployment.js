@@ -76,7 +76,8 @@ module.exports = function(req, res) {
             name: _repo.name,
             username: _repo.owner.username,
             url: _repo.url,
-            env: _env.alias
+            env: _env.alias,
+            version: _deployment.version
           };
 
           var deployer = new Deployer(data);

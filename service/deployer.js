@@ -244,6 +244,11 @@ Deployer.prototype.read_pkg = function() {
 
   require.cache[this._pkg_json_file] = null;
   this.pkg = require(this._pkg_json_file);
+
+  if (this.pkg.version === this.args.version) {
+    throw new Error('已发布过当前版本 - ' + this.args.version);
+  }
+
   // 静态资源服务器的目录(含资源版本)
   this.dest_dir = path.resolve(config[this.args.env].static_server, this.args.username, this.args.name, this.pkg.version);
 
