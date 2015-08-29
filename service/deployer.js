@@ -97,8 +97,8 @@ Deployer.prototype.run = function() {
     }
   }.bind(this))
     .then(this.fetch.bind(this))
-    .then(this.build.bind(this))
     .then(this.read_pkg.bind(this))
+    .then(this.build.bind(this))
     .then(this.sync_server.bind(this))
     .then(this.sync_qiniu.bind(this))
     .then(this.update_version.bind(this))
