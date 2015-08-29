@@ -4,6 +4,7 @@ log/
 conf.json
 config.js
 bower_components/
+dump.rdb
 
 # Numerous always-ignore extensions
 *.bak
