@@ -3,6 +3,7 @@ deploy/
 log/
 conf.json
 config.js
+config-default.js
 bower_components/
 dump.rdb
 
