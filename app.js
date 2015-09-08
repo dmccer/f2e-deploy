@@ -7,7 +7,7 @@ var RedisStore = require('connect-redis')(session);
 var config = require('./config');
 var log4js = require('log4js');
 var logger = require('./logger')('log/deploy.log', 'deploy');
-var sign = require('./controller/sign');
+var auth = require('./middleware/auth');
 var api = require('./api');
 var web = require('./web');
 
@@ -33,7 +33,7 @@ app.use(session({
   saveUninitialized: true,
 }));
 
-app.use(sign.auth_user);
+app.use(auth.auth_user);
 app.use('/', web);
 app.use('/f2e', api);
 

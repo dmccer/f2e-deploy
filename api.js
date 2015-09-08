@@ -3,27 +3,14 @@ var router = express.Router();
 
 var download = require('./controller/download');
 var push = require('./controller/push');
-var auth_service = require('./service/authorization');
 var progresor = require('./controller/progress');
 var deployment = require('./controller/deployment');
+var auth = require('./middleware/auth');
 
 module.exports = router;
 
-router.use(function(req, res, next) {
-  var method = req.method.toLowerCase();
+router.get('/:name', auth.api, download);
 
-  if (method === 'get' &&
-    !auth_service.check(req.query.secret) ||
-    method === 'post' && !auth_service.check(req.body.secret)) {
-    //logger.warn('403 请求, ip: ' + req.ip);
-    res.status(403).send('无权限');
-    return;
-  }
-
-  next();
-});
-
-router.get('/:name', download);
-router.post('/', push);
-router.post('/deployment/:repo_id', deployment);
-router.get('/deployment/:repo_id/progress', progresor);
+router.post('/', auth.api, push);
+router.post('/deployment/:repo_id', auth.require_user, deployment);
+router.get('/deployment/:repo_id/progress', auth.require_user, progresor);
