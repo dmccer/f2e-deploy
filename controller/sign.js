@@ -1,14 +1,5 @@
 var config = require('../config');
 
-exports.require_user = function(req, res, next) {
-  var user = req.session.user;
-
-  if (!user) {
-    return res.redirect('/login');
-  }
-
-  next();
-}
 exports.show_login = function(req, res) {
   res.render('login');
 }
@@ -32,14 +23,4 @@ exports.log_off = function(req, res) {
   req.session.destroy();
   res.clearCookie(config.auth_cookie_name, { path: '/' });
   res.redirect('/login');
-}
-
-exports.auth_user = function(req, res, next) {
-  res.locals.user = null;
-
-  if (req.session.user) {
-    res.locals.user = req.session.user = config.user;
-  }
-
-  next();
 }

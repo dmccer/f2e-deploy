@@ -6,7 +6,6 @@
 var deployment = require('../model/deployment');
 var repo = require('../model/repo');
 var env = require('../model/env');
-var config = require('../config');
 var Deployer = require('../service/deployer');
 
 function validator(repo_id, env_id, branch) {
