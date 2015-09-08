@@ -66,7 +66,6 @@ $(function() {
         type: 'POST',
         dataType: 'json',
         data: {
-          secret: RepoMod.secret,
           env_id: env_id,
           branch: branch
         },
@@ -95,7 +94,6 @@ $(function() {
           type: 'GET',
           dataType: 'json',
           data: {
-            secret: RepoMod.secret,
             env: env_alias,
             branch: branch,
             _: Date.now()
@@ -121,9 +119,7 @@ $(function() {
       };
 
       _get_progress();
-    },
-
-    secret: 'yunhua@926'
+    }
   };
 
   RepoMod.init();
