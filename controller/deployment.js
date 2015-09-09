@@ -90,7 +90,8 @@ module.exports = function(req, res) {
               _deployment.save();
 
               res.status(200).json({
-                complete: true
+                complete: true,
+                deploy: _deployment.toObject()
               });
             })
             .catch(function(err) {
