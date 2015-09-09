@@ -68,6 +68,8 @@ function Deployer(args) {
  */
 Deployer.prototype.validate = function() {
   var keys = Object.keys(this.args);
+  keys.splice(keys.indexOf('version'), 1);
+
   var pass = keys.every(function(key) {
     var val = this.args[key];
 
@@ -192,6 +194,14 @@ Deployer.prototype.fetch = function() {
     throw err;
   }
 
+  var unzip_repos = shell.exec(['tar zxvf', this._tar_gz_file, '-C', this.out_dir].join(' '));
+  if (unzip_repos.code !== 0) {
+    err_msg = '解压' + out_file + '失败';
+    err = new Error(err_msg);
+
+    throw err;
+  }
+
   return new Promise(this.step(2));
 }
 
@@ -202,14 +212,6 @@ Deployer.prototype.fetch = function() {
  */
 Deployer.prototype.build = function() {
   var err, err_msg;
-
-  var unzip_repos = shell.exec(['tar zxvf', this._tar_gz_file, '-C', this.out_dir].join(' '));
-  if (unzip_repos.code !== 0) {
-    err_msg = '解压' + out_file + '失败';
-    err = new Error(err_msg);
-
-    throw err;
-  }
 
   // 进入目录 out_dir
   shell.cd(this.out_dir);
