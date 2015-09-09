@@ -15,7 +15,7 @@ block content
 			.page-err-tip #{err.message}
 		else
 			h2.repo-title
-				a(href=repo.url) 
+				a(href=repo.url, target="_blank") 
 					span.owner #{repo.owner.name}
 					span.name #{repo.name}
 					if repo.version
@@ -62,7 +62,7 @@ block content
 					.field
 						label.label 选择分支
 						.control
-							select.branch-list(eid="branch", name="branch", disabled=Boolean(!!branches.length))
+							select.branch-list(eid="branch", name="branch", disabled=Boolean(!branches.length))
 								each branch in branches
 									option(value=branch) #{branch}
 					.field
