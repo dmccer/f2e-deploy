@@ -4,7 +4,7 @@ function api_check(secret) {
   return secret === config.default_secret;
 }
 
-exports.api = function(secret) {
+exports.api = function(req, res, next) {
   var method = req.method.toLowerCase();
 
   if (method === 'get' &&
