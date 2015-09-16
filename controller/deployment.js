@@ -88,10 +88,13 @@ module.exports = function(req, res) {
             .then(function() {
               _deployment.status = 0;
               _deployment.save();
-
+ 
               res.status(200).json({
                 complete: true,
-                deploy: _deployment.toObject()
+                deploy: {
+                  version: _deployment.get('version'),
+                  status: 0
+                }
               });
             })
             .catch(function(err) {
